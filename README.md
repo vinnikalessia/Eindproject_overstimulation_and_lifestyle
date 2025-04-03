@@ -21,9 +21,9 @@ git clone https://github.com/vinnikalessia/Eindproject_overstimulation_and_lifes
 cd Eindproject_overstimulation_and_lifestyle
 ```
 
-2. Install Poetry:
+2. Install the required dependencies using pip:
 ```sh
-pip install poetry
+pip install -r requirements.txt
 ```
 
 3. 
