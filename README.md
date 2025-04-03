@@ -14,16 +14,37 @@ The dataset used in this project comes from Kaggle [Overstimulation Behavior and
 The project is structured as follows:
 ...
 
-## Installation
-1. Clone the repository to your local machine using the following command:
+## Project Installation
+### Step 1: Clone the repository to your local machine using the following command:
 ```sh
 git clone https://github.com/vinnikalessia/Eindproject_overstimulation_and_lifestyle.git
 cd Eindproject_overstimulation_and_lifestyle
 ```
 
-2. Install the required dependencies using pip:
+### Step 2: Create a virtual environment (optional but recommended):
+```sh
+python -m venv .venv
+```
+
+For **Windows**:
+```sh
+venv\Scripts\activate
+```
+
+Or **macOS/Linux**:
+```sh
+source venv/bin/activate
+```
+
+### Step 3: Install the required dependencies using pip: 
 ```sh
 pip install -r requirements.txt
 ```
+### Step 4: Select a kernel in Jupyter Notebook
+Before running the Jupyter Notebook, make sure to select the correct kernel that corresponds to your virtual environment. You can do this by clicking on "Kernel" in the Jupyter Notebook menu, then selecting "Change kernel" and choosing the appropriate kernel from the list.
 
-3. 
+
+Now you can run the Jupyter Notebook and start working with the code!
+
+## Usage
+...
