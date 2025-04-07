@@ -1,1 +1,3 @@
 .venv
+.streamlit
+allowed_users.json
