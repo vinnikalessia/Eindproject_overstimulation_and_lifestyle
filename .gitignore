@@ -1,6 +1,6 @@
 .venv
-.streamlit/*
-allowed_users.json
+client/.streamlit/*
+client/allowed_users.json
 
 # except these files
-!.streamlit/config.toml
+!client/.streamlit/config.toml
