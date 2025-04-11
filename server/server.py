@@ -1,44 +1,81 @@
-#Onderstaande lijnen zijn enkel nodig wanneer je test in Visual Studio Code
-import sys 
-from pathlib import Path 
-print(sys.path[0]) 
-sys.path[0] = str(Path(sys.path[0]).parent) #uitvoeringspad wordt op niveau van parent-map gezet 
-#print(sys.path[0]) #test
-
-
+from dotenv import load_dotenv
+from threading import Thread
+import threading
 import logging
 import socket
-# create a socket object
-import threading
+import json
+import os
 
-from server.clienthandler import ClientHandler
-
+load_dotenv()
 
 logging.basicConfig(level=logging.DEBUG)
 
-serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = socket.gethostname()
-port = 8502
+class Server(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+        self.list_clients = []
+        self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        host = socket.gethostname()
+        port = int(os.getenv("PORT"))
+        # bind to the port
+        self.serversocket.bind((host, port))
+        # queue up to 5 requests
+        self.serversocket.listen(5)
+    
+    def run(self):
+        while True:
+            try:
+                logging.info("Server: waiting for a client...")
+                # establish a connection
+                socket_to_client, addr = self.serversocket.accept()
+                logging.info(f"Server: Got a connection from {addr})")
+                clh = ClientHandler(socket_to_client)
+                self.list_clients.append(clh)
+                clh.start()
+                logging.info(f"Server: ok, clienthandler started. Current Thread count: {threading.active_count()}.")
+                logging.info(f"aantal clienthandlers: {len(self.list_clients)}")
+            except Exception as e:
+                logging.error(f"Server: error in server thread: {e}")
+                break
 
-# bind to the port
-serversocket.bind((host, port))
+class ClientHandler(Thread):
+    def __init__(self, socket_to_client):
+        Thread.__init__(self)
+        self.socket_to_client = socket_to_client
+        threads: list[Thread] = threading.enumerate()
 
-# queue up to 5 requests
-serversocket.listen(5)
+        self.server_thread = None
+        for thread in threads:
+            if isinstance(thread, Server):
+                self.server_thread = thread
+                break
 
-list_clients = []
+    def run(self):
+        try:
+            io_stream_client = self.socket_to_client.makefile(mode='rw')
+            logging.info("CLH - started & waiting...")
+            # waiting for first commando
+            msg: str = io_stream_client.readline().rstrip('\n')
+            msg: dict = json.loads(msg)
+            commando = msg["commando"]
 
-# van deze file ene klasse maken en port, host en lijst properties maken
+            while commando != "CLOSE":
+                logging.debug(f"CLH - Number 1: {msg['getal1']}")
+                logging.debug(f"CLH - Number 2: {msg['getal2']}")
 
-while True:
-    logging.info("Server: waiting for a client...")
+                sum = int(msg["getal1"]) + int(msg["getal2"])
+                io_stream_client.write(f"{sum}\n")
+                io_stream_client.flush()
+                logging.debug(f"CLH - Sending back sum: {sum}")
 
-    # establish a connection
-    socket_to_client, addr = serversocket.accept()
+                # waiting for new commando
+                msg: str = io_stream_client.readline().rstrip('\n')
+                msg: dict = json.loads(msg)
+                commando = msg["commando"]
+            self.server_thread.list_clients.remove(self)
+        except Exception as e:
+            logging.error(f"CLH - error in clienthandler thread: {e}")
 
-    logging.info(f"Server: Got a connection from {addr})")
-    clh = ClientHandler(socket_to_client)
-    list_clients.append(clh)
-    clh.start()
-    logging.info(f"Server: ok, clienthandler started. Current Thread count: {threading.active_count()}.")
-    logging.info(f"aantal clienthandlers: {len(list_clients)}")
+
+server = Server()
+server.start()

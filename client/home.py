@@ -36,9 +36,10 @@ allowed_users = Auth.load_users()
 
 ##########################################
 import json
+import os
 
-host = socket.gethostname()
-port = 8501
+host = os.getenv("HOST")
+port = os.getenv("PORT")
 
 if "connected" not in st.session_state:
     st.session_state.connected = False
