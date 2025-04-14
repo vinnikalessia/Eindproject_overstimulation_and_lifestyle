@@ -1,5 +1,7 @@
 from dotenv import load_dotenv
 from threading import Thread
+from search import Search
+import pandas as pd
 import threading
 import logging
 import socket
@@ -7,19 +9,24 @@ import json
 import os
 
 load_dotenv()
+search = Search()
 
 logging.basicConfig(level=logging.DEBUG)
 
 class Server(Thread):
     def __init__(self):
+        # initialize the thread, list of clients and read data
         Thread.__init__(self)
         self.list_clients = []
+        self.data = pd.read_csv("./dataset/dataset.csv")
+        
+        # creating socket
         self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         host = socket.gethostname()
         port = int(os.getenv("PORT"))
-        # bind to the port
+
+        # bind to the port and queue up to 5 requests
         self.serversocket.bind((host, port))
-        # queue up to 5 requests
         self.serversocket.listen(5)
     
     def run(self):
@@ -60,18 +67,27 @@ class ClientHandler(Thread):
             commando = msg["commando"]
 
             while commando != "CLOSE":
-                logging.debug(f"CLH - Number 1: {msg['getal1']}")
-                logging.debug(f"CLH - Number 2: {msg['getal2']}")
+                if commando == "Overstimulated by age":
+                    logging.debug(f"CLH  SEARCH: count overstimulated people of certain age.")
+                    # get message/parameter from client
+                    Age = msg["Age"]
+                    logging.debug(f"CLH  \tchosen age: {Age}")
 
-                sum = int(msg["getal1"]) + int(msg["getal2"])
-                io_stream_client.write(f"{sum}\n")
-                io_stream_client.flush()
-                logging.debug(f"CLH - Sending back sum: {sum}")
-
+                    total, overstimulated, data = search.overstimulated_by_age(self.server_thread.data, Age)
+                    logging.debug(f"CLH  \t{overstimulated} of {total} people are overstimulated at the age of {Age}.")
+                    
+                    res: dict = {"total": total, "overstimulated": overstimulated, "data": data}
+                    res: str = json.dumps(res)
+                    io_stream_client.write(f"{res}\n")
+                    io_stream_client.flush()
+                
                 # waiting for new commando
                 msg: str = io_stream_client.readline().rstrip('\n')
                 msg: dict = json.loads(msg)
                 commando = msg["commando"]
+            
+            # close the connection
+            logging.info(f"CLH - closing connection with {self.socket_to_client.getpeername()}")
             self.server_thread.list_clients.remove(self)
         except Exception as e:
             logging.error(f"CLH - error in clienthandler thread: {e}")

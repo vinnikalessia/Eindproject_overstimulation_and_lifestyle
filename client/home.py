@@ -2,7 +2,9 @@
 # ────────────────────────────────────
 from connection import connection
 from auth import authentication
+import matplotlib.pyplot as plt
 import streamlit as st
+import pandas as pd
 import logging
 import socket
 import time
@@ -52,23 +54,39 @@ def get_cached_connection():
     st.session_state.connected = True
     return connect
 
+# connect with server
 if st.button("Connect"):
-    st.text("Connecting to server...")
     connect = get_cached_connection()
-    st.text("Connected to server!")
-    logging.info("Making connection with server...")
 
-# connect = get_cached_connection()
-
-if st.button("calculate 5 + 10", disabled=not st.session_state.connected):
-    msg: dict = {"commando": "som", "getal1": 5, "getal2": 10}
+# How many people are overstimulated with the chosen age?
+if st.number_input("Overstimulated by age", min_value=0, max_value=100, value=0, disabled=not st.session_state.connected, key="number_input"):
+    # send message to server with age as parameter
+    age = st.session_state.number_input
+    msg: dict = {"commando": "Overstimulated by age", "Age": age}
     msg: str = json.dumps(msg)
     connect = get_cached_connection()
     connect.io_stream_client.write(f"{msg}\n")
     connect.io_stream_client.flush()
+
+    # get result from server
     res: str = connect.io_stream_client.readline().rstrip('\n')
-    logging.debug(f"CLH - Sending back sum: {res}")
-    st.write(f"CLH - Sending back sum: {res}")
+    res: dict = json.loads(res)
+    st.write(f"Of {res['total']} people, {res['overstimulated']} are overstimulated at the age {age}")
+
+    # convert str to json to dataframe
+    str_data = res["data"]
+    json_data = json.loads(str_data)
+    data = pd.DataFrame(json_data)
+
+    # Replace 0/1 with No/Yes
+    data["Overstimulated"] = data["Overstimulated"].replace({0: "No", 1: "Yes"})
+
+    # Count how many people are overstimulated or not
+    counts = data["Overstimulated"].value_counts().reset_index()
+    counts.columns = ["Overstimulated", "Count"]
+
+    st.bar_chart(counts.set_index("Overstimulated"), color="#5D848D")
+
 
 if st.button("CLOSE", disabled=not st.session_state.connected):
     msg: dict = {"commando": "CLOSE"}
