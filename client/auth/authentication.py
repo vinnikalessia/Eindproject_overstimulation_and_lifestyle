@@ -28,5 +28,5 @@ class Auth():
     def redirecting():
         st.error("You should be logged in to see this page.", icon="❗")
         with st.spinner("Redirecting soon...", show_time=False):
-            time.sleep(5)
+            time.sleep(3)
         st.switch_page("home.py")

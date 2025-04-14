@@ -11,6 +11,8 @@ Auth = authentication.Auth()
 user = st.experimental_user
 allowed_users = Auth.load_users()
 
+st.set_page_config(page_title="test", page_icon="")
+
 # Authentication & app                |
 # ────────────────────────────────────
 if not user.is_logged_in:
