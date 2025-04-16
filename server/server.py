@@ -22,7 +22,9 @@ class Server(Thread):
         
         # creating socket
         self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        host = socket.gethostname()
+        # host = socket.gethostname()
+        # port = int(os.getenv("PORT"))
+        host = "127.0.0.1"
         port = int(os.getenv("PORT"))
 
         # bind to the port and queue up to 5 requests
@@ -80,7 +82,9 @@ class ClientHandler(Thread):
                     res: str = json.dumps(res)
                     io_stream_client.write(f"{res}\n")
                     io_stream_client.flush()
-                
+                elif commando == "Login":
+                    io_stream_client.write(f"Login successful\n")
+                    io_stream_client.flush()
                 # waiting for new commando
                 msg: str = io_stream_client.readline().rstrip('\n')
                 msg: dict = json.loads(msg)

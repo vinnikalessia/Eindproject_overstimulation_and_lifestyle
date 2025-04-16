@@ -2,129 +2,76 @@
 # ────────────────────────────────────
 from streamlit_cookies_controller import CookieController
 from connection.connection import ClientServerConnection
-from connection.socketsManager import SocketsManager
-from streamlit_javascript import st_javascript
-from streamlit.components.v1 import html
-from auth import authentication
 import matplotlib.pyplot as plt
+from dotenv import load_dotenv
 import streamlit as st
 import pandas as pd
 import socket
-import uuid
 import time
 import json
 import os
 
 # Setup & init                        |
 # ────────────────────────────────────
-Auth = authentication.Auth()
+if "connected" not in st.session_state:
+    st.session_state.connected = False
 
-user = st.experimental_user
-allowed_users = Auth.load_users()
-
-st.set_page_config(page_title="Homepage", page_icon="🏠")
-
-# nog nodig?
-# if "connected" not in st.session_state:
-#     st.session_state.connected = False
-#     st.components.v1.html("""
-#         <script>localStorage.setItem("connected", "false");</script>
-#     """, height=0)
-
-# Check localStorage to restore connection state
-# connected_from_storage = st_javascript("localStorage.getItem('connected');")
-# if connected_from_storage == "true":
-#     st.session_state.connected = True
-
-# creates one time a SocketsManager instance for all clients
 @st.cache_resource
-def socket_manager() -> SocketsManager:
-    return SocketsManager()
-
-# creates a socket to connect to server
 def get_connection():
-    sm = socket_manager()
-    controller = CookieController()
-    client_cookie_guid = controller.get('client_cookie_guid')
-
-    if client_cookie_guid is None: # cookie is not yet in browser
-        # create a new socket connection
-        host = os.getenv("HOST", socket.gethostname())
-        port = int(os.getenv("PORT", 8502))
-        socket_connection = ClientServerConnection(host, port)
-        # set client_cookie_guid in cookies
-        controller.set('client_cookie_guid', socket_connection.client_cookie_guid)
-
-        sm.add_socket(socket_connection)
-    else: # cookie is already in browser
-        # check if socket already exists
-        socket_already_exists = False
-        socket_connection = sm.get_socket_by_cookie_guid(client_cookie_guid)
-        if socket_connection is None:
-            host = os.getenv("HOST", socket.gethostname())
-            port = int(os.getenv("PORT", 8502))
-            socket_connection = ClientServerConnection(host, port)
-            controller.set('client_cookie_guid', socket_connection.client_cookie_guid)
-            sm.add_socket(socket_connection)
-
+    load_dotenv()
+    host = os.getenv("HOST")
+    port = int(os.getenv("PORT"))
+    st.write(host, port)
+    socket_connection = ClientServerConnection(host, port)
+    socket_connection.connect()
     return socket_connection
 
-# controle
-list_sockets = socket_manager().sockets
-st.write(list_sockets)
+def send_message(data):
+    socket_connection = get_connection()
+    socket_connection.io_stream_client.write(data + "\n")
+    socket_connection.io_stream_client.flush()
+    # Wait for a response from the server
+    response = socket_connection.io_stream_client.readline()
+    return response
 
-# Authentication & app                |
-# ────────────────────────────────────
-if not user.is_logged_in:
-    st.title("Hello guest! 👋")
-    st.markdown("#### ⬅️ To use this app, please log in.")
-    with st.sidebar:
-        st.button("Log in", on_click=st.login)
-else:
-    # check if user is already registered
-    if user.email not in allowed_users:
-        allowed_users.add(user.email)
-        Auth.save_users(allowed_users)
-        st.success("You’ve been registered! Changes are being saved...")
-        time.sleep(3)
-        st.rerun()
+def send_close_message():
+    data = json.dumps({"commando": "CLOSE"})
+    socket_connection = get_connection()
+    socket_connection.io_stream_client.write(f"{data}\n")
+    socket_connection.io_stream_client.flush()
+    socket_connection.close()
 
-    # Webpage                         |
-    # ────────────────────────────────
-    with st.sidebar:
-        st.button("Log out", on_click=st.logout)
-    
-    st.title(f"Welcome, {user.name or user.email}!")
-
-    st.markdown("##### Connect and disconnect from server🔌")
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col1:
-        # button to connect with server
-        if st.button("Connect to server", icon="🟢"):
-            connect = get_connection()
-            # st.components.v1.html("""
-            #     <script>localStorage.setItem("connected", "true");</script>
-            # """, height=0)
-
-    with col2:
-        # button to disconnect from server
-        if st.button("Close connection server", disabled=not st.session_state.connected, icon="🔴"):
-            msg: dict = {"commando": "CLOSE"}
-            msg: str = json.dumps(msg)
-            connect = get_connection()
-            connect.io_stream_client.write(f"{msg}\n")
-            connect.io_stream_client.flush()
+if st.session_state.connected:
+    if st.button(":red[:material/wifi_off:] Disconnect from server"):
+        with st.spinner("Disconnecting..."):
+            time.sleep(1)
+            socket_connection = get_connection()
+            send_close_message()
             st.session_state.connected = False
-            st.components.v1.html("""
-                <script>localStorage.setItem("connected", "false");</script>
-            """, height=0)
-            st.text("Connection closed...")
             st.cache_resource.clear()
             st.rerun()
+else:
+    if st.button(":green[:material/wifi:] Connect to server"):
+        with st.spinner("Connecting..."):
+            time.sleep(1)
+            socket_connection = get_connection()
+            st.session_state.connected = True
+            st.rerun()
 
-    st.write(st.session_state.connected)
-    st.markdown("##### Connection status:")
-    if st.session_state.connected:
-        st.success("Connected to server!", icon="✅")
+name = st.text_input(":material/person: Enter your name", key="name", disabled=not st.session_state.connected)
+pswd = st.text_input(":material/key: Enter your password", key="pswd", disabled=not st.session_state.connected)
+
+disabled = not st.session_state.connected or not name or not pswd
+help = "Please connect to the server first." if not st.session_state.connected else ""
+help = "Enter all fields" if not name or not pswd else help
+
+if st.button("Login", type="primary", disabled=disabled, help=help):
+    if name and pswd:
+        # Send the login data to the server
+        data = json.dumps({"commando": "Login", "name": name, "password": pswd})
+        with st.spinner("Logging in..."):
+            time.sleep(1)
+            response = send_message(data)
+        st.write(response)
     else:
-        st.error("Not connected to server! Please connect to the server to use this app.", icon="❌")
+        st.warning("Please enter both name and password.")

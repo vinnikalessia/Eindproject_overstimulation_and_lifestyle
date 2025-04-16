@@ -7,7 +7,7 @@ class ClientServerConnection():
         logging.info("Initializing connection")
         self.host = host
         self.port = port
-        self.client_cookie_guid = uuid.uuid4()
+        self.client_cookie_guid = str(uuid.uuid4())
 
     def connect(self):
         logging.info("Making connection with server...")
