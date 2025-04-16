@@ -1,31 +1,42 @@
 # Imports                             |
 # ────────────────────────────────────
+from streamlit_javascript import st_javascript
 from connection import connection
 from auth import authentication
 import streamlit as st
 import pandas as pd
+import socket
 import time
 import json
 import os
 
 # Setup & init                        |
 # ────────────────────────────────────
+st.set_page_config(page_title="Overstimulated by age", page_icon="😥")
 Auth = authentication.Auth()
 
 user = st.experimental_user
 allowed_users = Auth.load_users()
 
+# Check localStorage to restore connection state
+connected_from_storage = st_javascript("localStorage.getItem('connected');")
+if connected_from_storage == "true":
+    st.session_state.connected = True
+
 if "connected" not in st.session_state:
     st.session_state.connected = False
+    st.components.v1.html("""
+        <script>localStorage.setItem("connected", "false");</script>
+    """, height=0)
 
 @st.cache_resource
 def get_cached_connection():
-    connect = connection.ServerConnection()
+    host = os.getenv("HOST", socket.gethostname())
+    port = int(os.getenv("PORT", 8502))
+    connect = connection.ServerConnection(host, port)
     connect.connect()
     st.session_state.connected = True
     return connect
-
-st.set_page_config(page_title="Overstimulated by age", page_icon="😥")
 
 # Authentication & app                |
 # ────────────────────────────────────
