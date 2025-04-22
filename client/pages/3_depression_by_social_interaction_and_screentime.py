@@ -60,7 +60,10 @@ else:
         json_data = json.loads(str_data)
         data = pd.DataFrame(json_data)
 
-        counts = data["Depression_Score"].value_counts().reset_index()
-        counts.columns = ["Depression_Score", "Count"]
+        if data.empty:
+            st.warning("No data available for the given parameters.", icon="⚠️")
+        else:
+            counts = data["Depression_Score"].value_counts().reset_index()
+            counts.columns = ["Depression_Score", "Count"]
 
-        st.bar_chart(counts.set_index("Depression_Score"), x_label="Depression score", y_label="Amount of people", color="#5D848D")
+            st.bar_chart(counts.set_index("Depression_Score"), x_label="Depression score", y_label="Amount of people", color="#5D848D")

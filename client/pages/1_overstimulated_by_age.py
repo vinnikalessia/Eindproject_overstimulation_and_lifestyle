@@ -37,7 +37,7 @@ if not st.session_state.connected or not st.session_state.user:
     st.switch_page("home.py")
 else:
     st.markdown("## How many people are :primary-background[overstimulated] in the selected :primary-background[age] group?")
-    input_age = st.number_input("Overstimulated by age", min_value=18, max_value=59, value=18)
+    input_age = st.number_input("Overstimulated by age", min_value=18, max_value=100, value=18)
     
     if st.button("Confirm"):
         # send message to server with age as parameter
@@ -58,12 +58,16 @@ else:
         json_data = json.loads(str_data)
         data = pd.DataFrame(json_data)
 
-        # Replace 0/1 with No/Yes
-        data["Overstimulated"] = data["Overstimulated"].replace({0: "No", 1: "Yes"})
+        # check if data is empty
+        if data.empty:
+            st.warning("No data available for the selected age group.")
+        else:
+            # Replace 0/1 with No/Yes
+            data["Overstimulated"] = data["Overstimulated"].replace({0: "No", 1: "Yes"})
 
-        # Count how many people are overstimulated or not
-        counts = data["Overstimulated"].value_counts().reset_index()
-        counts.columns = ["Overstimulated", "Count"]
+            # Count how many people are overstimulated or not
+            counts = data["Overstimulated"].value_counts().reset_index()
+            counts.columns = ["Overstimulated", "Count"]
 
-        # plot the data
-        st.bar_chart(counts.set_index("Overstimulated"), x_label="Overstimulated or not", y_label="Amount of people", color="#5D848D")
+            # plot the data
+            st.bar_chart(counts.set_index("Overstimulated"), x_label="Overstimulated or not", y_label="Amount of people", color="#5D848D")

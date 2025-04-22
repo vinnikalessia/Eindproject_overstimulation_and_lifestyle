@@ -73,9 +73,12 @@ else:
         # convert str to json to dataframe
         str_data = res["data"]
         json_data = json.loads(str_data)
-        df = pd.DataFrame(json_data)
+        data = pd.DataFrame(json_data)
 
-        counts = df["Headache_Frequency"].value_counts().reset_index()
-        counts.columns = ["Headache_Frequency", "Count"]
+        if data.empty:
+            st.warning("No data available for the selected exercise hours and overthinking score.")
+        else:
+            counts = data["Headache_Frequency"].value_counts().reset_index()
+            counts.columns = ["Headache_Frequency", "Count"]
 
-        st.bar_chart(counts.set_index("Headache_Frequency"), x_label="Headache frequency", y_label="Amount of people", color="#5D848D")
+            st.bar_chart(counts.set_index("Headache_Frequency"), x_label="Headache frequency", y_label="Amount of people", color="#5D848D")

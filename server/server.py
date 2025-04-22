@@ -34,17 +34,17 @@ class Server(Thread):
     def run(self):
         while True:
             try:
-                logging.info("Server: waiting for a client...")
+                logging.info("Server - waiting for a client...")
                 # establish a connection
                 socket_to_client, addr = self.serversocket.accept()
-                logging.info(f"Server: Got a connection from {addr})")
+                logging.info(f"Server - got a connection from {addr})")
                 clh = ClientHandler(socket_to_client)
                 self.list_clients.append(clh)
                 clh.start()
-                logging.info(f"Server: ok, clienthandler started. Current Thread count: {threading.active_count()}.")
-                logging.info(f"aantal clienthandlers: {len(self.list_clients)}")
+                logging.info(f"Server - ok, clienthandler started. Current Thread count: {threading.active_count()}.")
+                logging.info(f"Server - counts clienthandlers: {len(self.list_clients)}")
             except Exception as e:
-                logging.error(f"Server: error in server thread: {e}")
+                logging.error(f"Server - error in server thread: {e}")
                 break
 
 class ClientHandler(Thread):
@@ -62,32 +62,35 @@ class ClientHandler(Thread):
     def run(self):
         try:
             io_stream_client = self.socket_to_client.makefile(mode='rw')
-            logging.info("CLH - started & waiting...")
-            # waiting for first commando
+            logging.info("CLH \t- started & waiting...")
+            # waiting for first commando, but if empty, continue waiting
             msg: str = io_stream_client.readline().rstrip('\n')
-            msg: dict = json.loads(msg)
-            commando = msg["commando"]
+            if msg == "":
+                pass
+            else:
+                msg: dict = json.loads(msg)
+                commando = msg["commando"]
 
             while commando != "CLOSE":
                 if commando == "Overstimulated by age":
-                    logging.debug(f"CLH  SEARCH: count overstimulated people of certain age.")
+                    logging.debug(f"CLH  \tSEARCH: count overstimulated people of certain age.")
                     # get message/parameter from client
                     Age = msg["Age"]
-                    logging.debug(f"CLH  \tchosen age: {Age}")
+                    logging.debug(f"CLH  \t\tchosen age: {Age}")
 
                     total, overstimulated, data = search.overstimulated_by_age(self.server_thread.data, Age)
-                    logging.debug(f"CLH  \t{overstimulated} of {total} people are overstimulated at the age of {Age}.")
+                    logging.debug(f"CLH  \t\t{overstimulated} of {total} people are overstimulated at the age of {Age}.")
                     
                     res: dict = {"total": total, "overstimulated": overstimulated, "data": data}
                     res: str = json.dumps(res)
                     io_stream_client.write(f"{res}\n")
                     io_stream_client.flush()
                 elif commando == "Stress by sleep and overstimulated":
-                    logging.debug(f"CLH  SEARCH: average stress level of people with certain sleep hours and overstimulated.")
+                    logging.debug(f"CLH  \tSEARCH: average stress level of people with certain sleep hours and overstimulated.")
                     # get message/parameter from client
                     sleep_hours = msg["Sleep hours"]
                     overstimulated = msg["Overstimulated"]
-                    logging.debug(f"CLH  \tchosen sleep hours: {sleep_hours}, overstimulated: {overstimulated}")
+                    logging.debug(f"CLH  \t\tchosen sleep hours: {sleep_hours}, overstimulated: {overstimulated}")
 
                     data = search.stress_by_sleep_and_overstimulated(self.server_thread.data, sleep_hours, overstimulated)
 
@@ -96,11 +99,11 @@ class ClientHandler(Thread):
                     io_stream_client.write(f"{res}\n")
                     io_stream_client.flush()
                 elif commando == "Depression by social interactions and screen time":
-                    logging.debug(f"CLH  SEARCH: depression score of people with certain social interactions and screen time.")
+                    logging.debug(f"CLH  \tSEARCH: depression score of people with certain social interactions and screen time.")
                     # get message/parameter from client
                     social_interaction = msg["social_interaction"]
                     screen_time = msg["screen_time"]
-                    logging.debug(f"CLH  \tsocial interactions: {social_interaction}, screen time: {screen_time}")
+                    logging.debug(f"CLH  \t\tsocial interactions: {social_interaction}, screen time: {screen_time}")
 
                     data = search.depression_by_social_interactions_and_screen_time(self.server_thread.data, social_interaction, screen_time)
                     res: dict = {"data": data}
@@ -108,11 +111,11 @@ class ClientHandler(Thread):
                     io_stream_client.write(f"{res}\n")
                     io_stream_client.flush()
                 elif commando == "Headache by exercise hours and overthinking":
-                    logging.debug(f"CLH  SEARCH: headache score of people with certain exercise hours and overthinking.")
+                    logging.debug(f"CLH  \tSEARCH: headache score of people with certain exercise hours and overthinking.")
                     # get message/parameter from client
                     exercise_hours = msg["exercise_hours"]
                     overthinking_score = msg["overthinking_score"]
-                    logging.debug(f"CLH  \texercise hours: {exercise_hours}, overthinking score: {overthinking_score}")
+                    logging.debug(f"CLH  \t\texercise hours: {exercise_hours}, overthinking score: {overthinking_score}")
 
                     data = search.headache_by_exercise_hours_and_overthinking(self.server_thread.data, exercise_hours, overthinking_score)
                     res: dict = {"data": data}
@@ -130,12 +133,12 @@ class ClientHandler(Thread):
 
                     for user in allowed_users["users"]:
                         if user["name"] == name and user["password"] == password:
-                            logging.debug(f"CLH  \tLogin successful for {name}")
+                            logging.debug(f"CLH  \t\tLogin successful for {name}")
                             io_stream_client.write(f"Success\n")
                             io_stream_client.flush()
                             break
                         else:
-                            logging.debug(f"CLH  \tLogin failed for {name}")
+                            logging.debug(f"CLH  \t\tLogin failed for {name}")
                             io_stream_client.write(f"Failed\n")
                             io_stream_client.flush()
                 # waiting for new commando
@@ -144,10 +147,10 @@ class ClientHandler(Thread):
                 commando = msg["commando"]
             
             # close the connection
-            logging.info(f"CLH - closing connection with {self.socket_to_client.getpeername()}")
+            logging.info(f"CLH \t- closing connection with {self.socket_to_client.getpeername()}")
             self.server_thread.list_clients.remove(self)
         except Exception as e:
-            logging.error(f"CLH - error in clienthandler thread: {e}")
+            logging.error(f"CLH \t- error in clienthandler thread: {e}")
 
 
 server = Server()

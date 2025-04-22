@@ -40,7 +40,7 @@ else:
     
     col1, col2 = st.columns(2)
     with col1:
-        sleep_hours = st.number_input("Hours of sleep", min_value=0, max_value=24, value=0, key="sleephours")
+        sleep_hours = st.number_input("Hours of sleep", min_value=3, max_value=10, value=3, key="sleephours")
     with col2:
         overstimulated = st.selectbox("Overstimulated?", ["Yes", "No"], key="overstimulated")
 
@@ -61,7 +61,11 @@ else:
         json_data = json.loads(str_data)
         data = pd.DataFrame(json_data)
 
-        counts = data["Stress_Level"].value_counts().reset_index()
-        counts.columns = ["Stress_Level", "Count"]
+        # check if data is empty, empty dataframe
+        if data.empty:
+            st.warning("No data found for the given parameters.", icon="⚠️")
+        else:
+            counts = data["Stress_Level"].value_counts().reset_index()
+            counts.columns = ["Stress_Level", "Count"]
 
-        st.bar_chart(counts.set_index("Stress_Level"), x_label="Stress level", y_label="Amount of people", color="#5D848D")
+            st.bar_chart(counts.set_index("Stress_Level"), x_label="Stress level", y_label="Amount of people", color="#5D848D")
