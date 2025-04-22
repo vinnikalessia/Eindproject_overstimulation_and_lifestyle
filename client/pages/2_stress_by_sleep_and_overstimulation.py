@@ -10,7 +10,7 @@ import os
 
 # Setup & init                        |
 # ────────────────────────────────────
-st.set_page_config(page_title="Overstimulated by age", page_icon="😥")
+st.set_page_config(page_title="Average stress level based on sleep and overstimulated", page_icon="🫨")
 
 if "connected" not in st.session_state:
     st.session_state.connected = False
@@ -29,20 +29,24 @@ def get_connection():
 
 # Authentication & app                |
 # ────────────────────────────────────
-# How many people are overstimulated with the chosen age?
+# What is the average stress level of people with the chosen sleep hours and overstimulated?
 if not st.session_state.connected or not st.session_state.user:
     st.title("Welcome guest! 👋")
     st.error("Sorry, you can't use the app unless you are connected and logged in.", icon="❗")
     time.sleep(3)
     st.switch_page("home.py")
 else:
-    st.markdown("## How many people are :primary-background[overstimulated] in the selected :primary-background[age] group?")
-    input_age = st.number_input("Overstimulated by age", min_value=18, max_value=59, value=18)
+    st.markdown(f"## How :primary-background[stressed] are people depending on how much they :primary-background[sleep] and whether they’re :primary-background[overstimulated]?")
     
+    col1, col2 = st.columns(2)
+    with col1:
+        sleep_hours = st.number_input("Hours of sleep", min_value=0, max_value=24, value=0, key="sleephours")
+    with col2:
+        overstimulated = st.selectbox("Overstimulated?", ["Yes", "No"], key="overstimulated")
+
     if st.button("Confirm"):
-        # send message to server with age as parameter
-        age = input_age
-        msg: dict = {"commando": "Overstimulated by age", "Age": age}
+        # send message to server with sleep hours and overstimulated as parameters
+        msg: dict = {"commando": "Stress by sleep and overstimulated", "Sleep hours": sleep_hours, "Overstimulated": overstimulated}
         msg: str = json.dumps(msg)
         connect = get_connection()
         connect.io_stream_client.write(f"{msg}\n")
@@ -51,19 +55,13 @@ else:
         # get result from server
         res: str = connect.io_stream_client.readline().rstrip('\n')
         res: dict = json.loads(res)
-        st.write(f"Of {res['total']} people, {res['overstimulated']} are overstimulated at the age {age}")
 
         # convert str to json to dataframe
         str_data = res["data"]
         json_data = json.loads(str_data)
         data = pd.DataFrame(json_data)
 
-        # Replace 0/1 with No/Yes
-        data["Overstimulated"] = data["Overstimulated"].replace({0: "No", 1: "Yes"})
+        counts = data["Stress_Level"].value_counts().reset_index()
+        counts.columns = ["Stress_Level", "Count"]
 
-        # Count how many people are overstimulated or not
-        counts = data["Overstimulated"].value_counts().reset_index()
-        counts.columns = ["Overstimulated", "Count"]
-
-        # plot the data
-        st.bar_chart(counts.set_index("Overstimulated"), x_label="Overstimulated or not", y_label="Amount of people", color="#5D848D")
+        st.bar_chart(counts.set_index("Stress_Level"), x_label="Stress level", y_label="Amount of people", color="#5D848D")

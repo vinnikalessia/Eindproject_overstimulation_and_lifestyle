@@ -82,9 +82,62 @@ class ClientHandler(Thread):
                     res: str = json.dumps(res)
                     io_stream_client.write(f"{res}\n")
                     io_stream_client.flush()
-                elif commando == "Login":
-                    io_stream_client.write(f"Login successful\n")
+                elif commando == "Stress by sleep and overstimulated":
+                    logging.debug(f"CLH  SEARCH: average stress level of people with certain sleep hours and overstimulated.")
+                    # get message/parameter from client
+                    sleep_hours = msg["Sleep hours"]
+                    overstimulated = msg["Overstimulated"]
+                    logging.debug(f"CLH  \tchosen sleep hours: {sleep_hours}, overstimulated: {overstimulated}")
+
+                    data = search.stress_by_sleep_and_overstimulated(self.server_thread.data, sleep_hours, overstimulated)
+
+                    res: dict = {"data": data}
+                    res: str = json.dumps(res)
+                    io_stream_client.write(f"{res}\n")
                     io_stream_client.flush()
+                elif commando == "Depression by social interactions and screen time":
+                    logging.debug(f"CLH  SEARCH: depression score of people with certain social interactions and screen time.")
+                    # get message/parameter from client
+                    social_interaction = msg["social_interaction"]
+                    screen_time = msg["screen_time"]
+                    logging.debug(f"CLH  \tsocial interactions: {social_interaction}, screen time: {screen_time}")
+
+                    data = search.depression_by_social_interactions_and_screen_time(self.server_thread.data, social_interaction, screen_time)
+                    res: dict = {"data": data}
+                    res: str = json.dumps(res)
+                    io_stream_client.write(f"{res}\n")
+                    io_stream_client.flush()
+                elif commando == "Headache by exercise hours and overthinking":
+                    logging.debug(f"CLH  SEARCH: headache score of people with certain exercise hours and overthinking.")
+                    # get message/parameter from client
+                    exercise_hours = msg["exercise_hours"]
+                    overthinking_score = msg["overthinking_score"]
+                    logging.debug(f"CLH  \texercise hours: {exercise_hours}, overthinking score: {overthinking_score}")
+
+                    data = search.headache_by_exercise_hours_and_overthinking(self.server_thread.data, exercise_hours, overthinking_score)
+                    res: dict = {"data": data}
+                    res: str = json.dumps(res)
+                    io_stream_client.write(f"{res}\n")
+                    io_stream_client.flush()
+                    ...
+                elif commando == "Login":
+                    name = msg["name"]
+                    password = msg["password"]
+                    logging.debug(f"CLH  \tLogin: {name}")
+
+                    with open("./server/allowed_users.json", "r", encoding="utf-8") as f:
+                        allowed_users = json.load(f)
+
+                    for user in allowed_users["users"]:
+                        if user["name"] == name and user["password"] == password:
+                            logging.debug(f"CLH  \tLogin successful for {name}")
+                            io_stream_client.write(f"Success\n")
+                            io_stream_client.flush()
+                            break
+                        else:
+                            logging.debug(f"CLH  \tLogin failed for {name}")
+                            io_stream_client.write(f"Failed\n")
+                            io_stream_client.flush()
                 # waiting for new commando
                 msg: str = io_stream_client.readline().rstrip('\n')
                 msg: dict = json.loads(msg)
