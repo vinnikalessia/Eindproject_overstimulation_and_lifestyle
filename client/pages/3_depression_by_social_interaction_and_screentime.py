@@ -40,9 +40,9 @@ else:
     
     col1, col2 = st.columns(2)
     with col1:
-        social_interaction = st.number_input("Amount of social interaction per day", min_value=0, max_value=9, value=0, key="social_interactions")
+        social_interaction = st.number_input("Amount of social interaction per day", min_value=0, max_value=9, value=0, help="How many :primary-badge[times] there is a social interaction in a day?", key="social_interactions")
     with col2:
-        screen_time = st.number_input("Average screen time per day", min_value=0, max_value=12, value=0, key="screentime")
+        screen_time = st.number_input("Average screen time per day", min_value=0, max_value=12, value=0, help="Rounded by :primary-badge[hours]", key="screentime")
     if st.button("Confirm"):
         # send message to server with social interactions and screen time as parameters
         msg: dict = {"commando": "Depression by social interactions and screen time", "social_interaction": social_interaction, "screen_time": screen_time}

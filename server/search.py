@@ -1,15 +1,8 @@
-import matplotlib.pyplot as plt
-from dotenv import load_dotenv
-from threading import Thread
 import pandas as pd
 import numpy as np
-import threading
-import logging
-import socket
-import json
-import os
 
 class Search():
+    # Zoekopdracht 1: How many people are overstimulated with the chosen age?
     def overstimulated_by_age(self, data: pd.DataFrame, age: int) -> pd.DataFrame:
         """
         Returns the sum of people overstimulated by given age.
@@ -24,6 +17,7 @@ class Search():
 
         return total_by_age, total_overstimulated, res_data
     
+    # Zoekopdracht 2: What is the average stress level of people with the chosen sleep hours and overstimulated?
     def stress_by_sleep_and_overstimulated(self, data: pd.DataFrame, sleep_hours: int, overstimulated: str) -> pd.DataFrame:
         """
         Returns the average stress level of people with the given sleep hours and overstimulated.
@@ -34,53 +28,61 @@ class Search():
             overstimulated = 0
 
         # filter dataset for overstimulated
-        df = data[data['Overstimulated'] == overstimulated]
+        data = data[data['Overstimulated'] == overstimulated]
 
         # round sleephours to nearest integer
-        df['Sleep_Hours'] = df['Sleep_Hours'].round(0)
+        data['Sleep_Hours'] = data['Sleep_Hours'].round(0)
 
         # filter on sleep_hours
-        df = df[df['Sleep_Hours'] == sleep_hours]
+        data = data[data['Sleep_Hours'] == sleep_hours]
 
         # only keep Stress_Level column
-        df = df[['Stress_Level']].to_json(orient="records")
+        res_data = data[['Stress_Level']].to_json(orient="records")
 
-        return df
+        return res_data
 
+    # Zoekopdracht 3: What could be my depression score if I have x social interactions and y screen time?
     def depression_by_social_interactions_and_screen_time(self, data: pd.DataFrame, social_interaction: int, screen_time: int) -> pd.DataFrame:
         """
         Returns the average depression score of people with the given social interactions and screen time.
         """
         # filter dataset for social interaction
-        df = data[data['Social_Interaction'] == social_interaction]
+        data = data[data['Social_Interaction'] == social_interaction]
 
         # round screen time to nearest integer
-        df['Screen_Time'] = df['Screen_Time'].round(0)
+        data['Screen_Time'] = data['Screen_Time'].round(0)
 
-        # filter on screen time
-        df = df[df['Screen_Time'] == screen_time].to_json(orient="records")
+        # filter on screen_time
+        data = data[data['Screen_Time'] == screen_time]
 
-        return df
+        # only keep Depression_Score column
+        res_data = data[['Depression_Score']].to_json(orient="records")
 
+        return res_data
+
+    # Zoekopdracht 4: How many times could I get a headache in a week if I have x exercise hours and y overthinking?
     def headache_by_exercise_hours_and_overthinking(self, data: pd.DataFrame, exercise_hours: str, overthinking_score: int) -> pd.DataFrame:
         """
-        Returns the average headache score of people with the given workout time and overthinking score.
+        Returns the average headache score of people with the given exercise time and overthinking score.
         """
         # filter dataset for overthinking score
-        df = data[data['Overthinking_Score'] == overthinking_score]
+        data = data[data['Overthinking_Score'] == overthinking_score]
 
-        # Define your allowed values (buckets)
+        # Define your allowed values (buckets) for rounding
         rounding_buckets = np.array([0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0])
 
         # Custom rounding function
         def round_to_nearest_custom(x):
             return rounding_buckets[np.abs(rounding_buckets - x).argmin()]
 
-        # Round workout time to nearest custom value
-        df['Exercise_Hours'] = df['Exercise_Hours'].apply(round_to_nearest_custom)
+        # Round exercise time to nearest custom value
+        data['Exercise_Hours'] = data['Exercise_Hours'].apply(round_to_nearest_custom)
 
-        # filter on workout time
-        df = df[df['Exercise_Hours'] == exercise_hours].to_json(orient="records")
+        # filter on exercise time
+        data = data[data['Exercise_Hours'] == exercise_hours]
 
-        return df
+        # only keep Headache_Frequency column
+        res_data = data[['Headache_Frequency']].to_json(orient="records")
+
+        return res_data
 

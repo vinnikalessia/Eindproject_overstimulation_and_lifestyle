@@ -37,7 +37,7 @@ if not st.session_state.connected or not st.session_state.user:
     st.switch_page("home.py")
 else:
     st.markdown("## How many people are :primary-background[overstimulated] in the selected :primary-background[age] group?")
-    input_age = st.number_input("Overstimulated by age", min_value=18, max_value=100, value=18)
+    input_age = st.number_input("Select an age", min_value=18, max_value=100, value=18)
     
     if st.button("Confirm"):
         # send message to server with age as parameter

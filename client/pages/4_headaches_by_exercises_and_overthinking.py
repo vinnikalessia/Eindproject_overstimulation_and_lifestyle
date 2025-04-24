@@ -54,10 +54,10 @@ else:
     
     col1, col2 = st.columns(2)
     with col1:
-        exercise_hours = st.selectbox("How long the exercise is", time_options, index=0, key="exercise_hours")
+        exercise_hours = st.selectbox("Duration of the exercise", time_options, index=0, help="Duration per :primary-badge[15 minutes]", key="exercise_hours")
         exercise_hours = convert_time_to_float(exercise_hours)
     with col2:
-        overthinking_score = st.number_input("How much someone overthinks", min_value=1, max_value=9, value=1, help="1 being no overthinking and 9 a lot of overthinking", key="overthinking_score")
+        overthinking_score = st.number_input("Level of overthinking", min_value=1, max_value=9, value=1, help="1 is :primary-badge[no overthinking] and 9 is :primary-badge[a lot of overthinking]", key="overthinking_score")
     if st.button("Confirm"):
         # send message to server with exercise hours and overthinking score as parameters
         msg: dict = {"commando": "Headache by exercise hours and overthinking", "exercise_hours": exercise_hours, "overthinking_score": overthinking_score}
