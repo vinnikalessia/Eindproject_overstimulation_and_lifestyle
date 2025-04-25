@@ -10,7 +10,7 @@ import os
 
 # Setup & init                        |
 # ────────────────────────────────────
-st.set_page_config(page_title="Average depression score based on social interaction and screen time", page_icon="😟")
+st.set_page_config(page_title="Average depression score based on social interaction and screen time", page_icon="😟", layout="wide")
 
 if "connected" not in st.session_state:
     st.session_state.connected = False
@@ -38,32 +38,66 @@ if not st.session_state.connected or not st.session_state.user:
 else:
     st.markdown(f"## What could be the :primary-background[depression score] depending on amount of :primary-background[social interactions] and :primary-background[screen time]?")
     
-    col1, col2 = st.columns(2)
+    # some white space
+    st.container(border=False, height=32)
+
+    col1, col2, col3 = st.columns([2.5, 1, 5])
+
     with col1:
-        social_interaction = st.number_input("Amount of social interaction per day", min_value=0, max_value=9, value=0, help="How many :primary-badge[times] there is a social interaction in a day?", key="social_interactions")
-    with col2:
-        screen_time = st.number_input("Average screen time per day", min_value=0, max_value=12, value=0, help="Rounded by :primary-badge[hours]", key="screentime")
-    if st.button("Confirm"):
-        # send message to server with social interactions and screen time as parameters
-        msg: dict = {"commando": "Depression by social interactions and screen time", "social_interaction": social_interaction, "screen_time": screen_time}
-        msg: str = json.dumps(msg)
-        connect = get_connection()
-        connect.io_stream_client.write(f"{msg}\n")
-        connect.io_stream_client.flush()
+        coli1, coli2 = st.columns(2)
+        with coli1:
+            social_interaction = st.number_input("Social interaction", min_value=0, max_value=9, value=0, help="How many :primary-badge[times] there is a social interaction in a day.", key="social_interactions")
+        with coli2:
+            screen_time = st.number_input("Screen time", min_value=0, max_value=12, value=0, help="Rounded by :primary-badge[hours]", key="screentime")
+        
+        if st.button("Confirm", key="confirm"):
+            # send message to server with social interactions and screen time as parameters
+            msg: dict = {"commando": "Depression by social interactions and screen time", "social_interaction": social_interaction, "screen_time": screen_time}
+            msg: str = json.dumps(msg)
+            connect = get_connection()
+            connect.io_stream_client.write(f"{msg}\n")
+            connect.io_stream_client.flush()
 
-        # get result from server
-        res: str = connect.io_stream_client.readline().rstrip('\n')
-        res: dict = json.loads(res)
+            # get result from server
+            res: str = connect.io_stream_client.readline().rstrip('\n')
+            res: dict = json.loads(res)
 
-        # convert str to json to dataframe
-        str_data = res["data"]
-        json_data = json.loads(str_data)
-        data = pd.DataFrame(json_data)
+            # convert str to json to dataframe
+            str_data = res["data"]
+            json_data = json.loads(str_data)
+            data = pd.DataFrame(json_data)
 
-        if data.empty:
-            st.warning("No data available for the given parameters.", icon="⚠️")
+            if not data.empty:
+                counts = data["Depression_Score"].value_counts().reset_index()
+                counts.columns = ["Depression_Score", "Count"]
+
+            # plot the data in other column for more beautiful view
+
+        # white space
+        st.container(border=False, height=20)
+
+        st.write("##### Result:")
+        if st.session_state.confirm and not data.empty:
+            with st.container(border=True, height=100):
+                modes = data['Depression_Score'].mode()
+                mode_values = ' and '.join([str(int(val)) if isinstance(val, int) else str(round(val, 2)) for val in modes])
+
+                st.markdown(f"Common depression score: **:primary-background[{mode_values}]**")
         else:
-            counts = data["Depression_Score"].value_counts().reset_index()
-            counts.columns = ["Depression_Score", "Count"]
+            st.container(border=True, height=100)
 
+    with col2:
+        # vertical line to separate the columns
+        st.markdown(
+            """
+            <div style="height: 350px; width: 1px; background-color: #5D848D; margin: auto; opacity: 40%;"></div>
+            """,
+            unsafe_allow_html=True
+        )
+    
+    with col3:
+        st.container(border=False, height=20)
+        if st.session_state.confirm and not data.empty:
             st.bar_chart(counts.set_index("Depression_Score"), x_label="Depression score", y_label="Amount of people", color="#5D848D")
+        elif st.session_state.confirm and data.empty:
+            st.warning("No data found for the given parameters.", icon="⚠️")
