@@ -1,5 +1,6 @@
 # Imports                             |
 # ────────────────────────────────────
+from communication import get_connection, send_message, send_close_message, check_server_connection, get_response
 from connection.connection import ClientServerConnection
 from datetime import time as dt
 from dotenv import load_dotenv
@@ -19,14 +20,7 @@ if "connected" not in st.session_state:
 if "user" not in st.session_state:
     st.session_state.user = None
 
-@st.cache_resource
-def get_connection():
-    load_dotenv()
-    host = os.getenv("HOST")
-    port = int(os.getenv("PORT"))
-    socket_connection = ClientServerConnection(host, port)
-    socket_connection.connect()
-    return socket_connection
+check_server_connection()
 
 # list options exercise time
 time_options = ["0:00", "0:15", "0:30", "0:45", "1:00", "1:15", "1:30", "1:45", "2:00", "2:15", "2:30", "2:45", "3:00"]
@@ -53,7 +47,7 @@ else:
     st.markdown(f"## What could be the average occurences of :primary-background[headaches] depending on the hours of :primary-background[exercise] and the :primary-background[overthinking score]?")
     
     # some white space
-    st.container(border=False, height=32)
+    st.container(border=False, height=16)
 
     col1, col2, col3 = st.columns([2.5, 1, 5])
 
@@ -67,36 +61,20 @@ else:
         
         if st.button("Confirm", key="confirm"):
             # send message to server with exercise hours and overthinking score as parameters
-            msg: dict = {"commando": "Headache by exercise hours and overthinking", "exercise_hours": exercise_hours, "overthinking_score": overthinking_score}
-            msg: str = json.dumps(msg)
-            connect = get_connection()
-            connect.io_stream_client.write(f"{msg}\n")
-            connect.io_stream_client.flush()
+            commando: str = "Headache by exercise hours and overthinking"
+            data: dict = {"exercise_hours": exercise_hours, "overthinking_score": overthinking_score}
+            send_message(commando, data)
+            response = get_response()
 
-            # get result from server
-            res: str = connect.io_stream_client.readline().rstrip('\n')
-            res: dict = json.loads(res)
-
-            # convert str to json to dataframe
-            str_data = res["data"]
-            json_data = json.loads(str_data)
-            data = pd.DataFrame(json_data)
-
-            if not data.empty:
-                counts = data["Headache_Frequency"].value_counts().reset_index()
-                counts.columns = ["Headache_Frequency", "Count"]
-
-            # plot the data in other column for more beautiful view
+            df = pd.DataFrame(response["dataframe"])
+            mode_values = response["mode_values"]
         
         # white space
         st.container(border=False, height=20)
 
         st.write("##### Result:")
-        if st.session_state.confirm and not data.empty:
+        if st.session_state.confirm and not df.empty:
             with st.container(border=True, height=100):
-                modes = data['Headache_Frequency'].mode()
-                mode_values = ' and '.join([str(int(val)) if isinstance(val, int) else str(round(val, 2)) for val in modes])
-
                 st.markdown(f"Common headache frequency: **:primary-background[{mode_values}]**")
         else:
             st.container(border=True, height=100)
@@ -111,8 +89,8 @@ else:
         )
     
     with col3:
-        st.container(border=False, height=20)
-        if st.session_state.confirm and not data.empty:
-            st.bar_chart(counts.set_index("Headache_Frequency"), x_label="Headache frequency", y_label="Amount of people", color="#5D848D")
-        elif st.session_state.confirm and data.empty:
-            st.warning("No data found for the given parameters.", icon="⚠️")
+        st.container(border=False, height=24)
+        if st.session_state.confirm and not df.empty:
+            st.bar_chart(df.set_index("Headache_Frequency"), x_label="Headache frequency", y_label="Amount of people", color="#5D848D")
+        elif st.session_state.confirm and df.empty:
+            st.warning("No dataframe found for the given parameters.", icon="⚠️")

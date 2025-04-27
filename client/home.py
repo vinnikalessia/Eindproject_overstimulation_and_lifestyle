@@ -1,5 +1,6 @@
 # Imports                             |
 # ────────────────────────────────────
+from communication import get_connection, send_message, send_close_message, check_server_connection, get_response
 from streamlit_cookies_controller import CookieController
 from connection.connection import ClientServerConnection
 import matplotlib.pyplot as plt
@@ -27,40 +28,7 @@ if "state_message" not in st.session_state:
 if "error_message" not in st.session_state:
     st.session_state.error_message = None
 
-@st.cache_resource(show_spinner=False)
-def get_connection():
-    try:
-        load_dotenv()
-        host = os.getenv("HOST")
-        port = int(os.getenv("PORT"))
-        socket_connection = ClientServerConnection(host, port)
-        socket_connection.connect()
-        st.session_state.connected = True
-        st.session_state.state_message = "You are now connected to the server. Enjoy the app!"
-        return socket_connection
-    except socket.error as e:
-        st.session_state.state_message = f"Connection error: {e}. Please check your connection and try again."
-        time.sleep(3)
-        return None
-    except Exception as e:
-        st.session_state.state_message = f"An error occurred: {e}. Please try again later."
-        time.sleep(3)
-        return None
-
-def send_message(data):
-    socket_connection = get_connection()
-    socket_connection.io_stream_client.write(data + "\n")
-    socket_connection.io_stream_client.flush()
-    # Wait for a response from the server
-    response = socket_connection.io_stream_client.readline().rstrip('\n')
-    return response
-
-def send_close_message():
-    data = json.dumps({"commando": "CLOSE"})
-    socket_connection = get_connection()
-    socket_connection.io_stream_client.write(f"{data}\n")
-    socket_connection.io_stream_client.flush()
-    socket_connection.close()
+check_server_connection()
 
 # Authentication & app                |
 # ────────────────────────────────────
@@ -70,7 +38,6 @@ if not st.session_state.connected or not st.session_state.user:
 else:
     st.title(f"Welcome back! {st.session_state.user} 👋")
 
-@st.fragment()
 def connect_button():
     col1, col2 = st.columns([1, 2])
     with col1:
@@ -113,11 +80,14 @@ if not st.session_state.user:
     if st.button("Login", type="primary", disabled=disabled, help=help):
         if name and password:
             # Send the login data to the server
-            data: str = json.dumps({"commando": "Login", "name": name, "password": password})
             with st.spinner("Logging in..."):
                 time.sleep(1)
-                response = send_message(data)
-            
+                commando = "login"
+                data = {"name": name, "password": password}
+                send_message(commando, data)
+                response = get_response()
+                st.write(f"Server response: {response}")
+
             if response == "Success":
                 st.session_state.user = name
                 st.success(f"Login successful!")

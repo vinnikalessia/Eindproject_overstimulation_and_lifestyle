@@ -1,5 +1,6 @@
 # Imports                             |
 # ────────────────────────────────────
+from communication import send_message, check_server_connection, get_response
 from connection.connection import ClientServerConnection
 from dotenv import load_dotenv
 import streamlit as st
@@ -18,14 +19,7 @@ if "connected" not in st.session_state:
 if "user" not in st.session_state:
     st.session_state.user = None
 
-@st.cache_resource
-def get_connection():
-    load_dotenv()
-    host = os.getenv("HOST")
-    port = int(os.getenv("PORT"))
-    socket_connection = ClientServerConnection(host, port)
-    socket_connection.connect()
-    return socket_connection
+check_server_connection()
 
 # Authentication & app                |
 # ────────────────────────────────────
@@ -39,7 +33,7 @@ else:
     st.markdown(f"## What could be the :primary-background[depression score] depending on amount of :primary-background[social interactions] and :primary-background[screen time]?")
     
     # some white space
-    st.container(border=False, height=32)
+    st.container(border=False, height=16)
 
     col1, col2, col3 = st.columns([2.5, 1, 5])
 
@@ -52,36 +46,20 @@ else:
         
         if st.button("Confirm", key="confirm"):
             # send message to server with social interactions and screen time as parameters
-            msg: dict = {"commando": "Depression by social interactions and screen time", "social_interaction": social_interaction, "screen_time": screen_time}
-            msg: str = json.dumps(msg)
-            connect = get_connection()
-            connect.io_stream_client.write(f"{msg}\n")
-            connect.io_stream_client.flush()
+            commando: str = "Depression by social interactions and screen time"
+            data: dict = {"social_interaction": social_interaction, "screen_time": screen_time}
+            send_message(commando, data)
+            response = get_response()
 
-            # get result from server
-            res: str = connect.io_stream_client.readline().rstrip('\n')
-            res: dict = json.loads(res)
-
-            # convert str to json to dataframe
-            str_data = res["data"]
-            json_data = json.loads(str_data)
-            data = pd.DataFrame(json_data)
-
-            if not data.empty:
-                counts = data["Depression_Score"].value_counts().reset_index()
-                counts.columns = ["Depression_Score", "Count"]
-
-            # plot the data in other column for more beautiful view
+            df = pd.DataFrame(response["dataframe"])
+            mode_values = response["mode_values"]
 
         # white space
         st.container(border=False, height=20)
 
         st.write("##### Result:")
-        if st.session_state.confirm and not data.empty:
+        if st.session_state.confirm and not df.empty:
             with st.container(border=True, height=100):
-                modes = data['Depression_Score'].mode()
-                mode_values = ' and '.join([str(int(val)) if isinstance(val, int) else str(round(val, 2)) for val in modes])
-
                 st.markdown(f"Common depression score: **:primary-background[{mode_values}]**")
         else:
             st.container(border=True, height=100)
@@ -96,8 +74,8 @@ else:
         )
     
     with col3:
-        st.container(border=False, height=20)
-        if st.session_state.confirm and not data.empty:
-            st.bar_chart(counts.set_index("Depression_Score"), x_label="Depression score", y_label="Amount of people", color="#5D848D")
-        elif st.session_state.confirm and data.empty:
-            st.warning("No data found for the given parameters.", icon="⚠️")
+        st.container(border=False, height=24)
+        if st.session_state.confirm and not df.empty:
+            st.bar_chart(df.set_index("Depression_Score"), x_label="Depression score", y_label="Amount of people", color="#5D848D")
+        elif st.session_state.confirm and df.empty:
+            st.warning("No dataframe found for the given parameters.", icon="⚠️")

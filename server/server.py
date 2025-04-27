@@ -18,7 +18,6 @@ class Server(Thread):
         # initialize the thread, list of clients and read data
         Thread.__init__(self)
         self.list_clients = []
-        self.data = pd.read_csv("./dataset/dataset.csv")
         
         # creating socket
         self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -52,6 +51,7 @@ class ClientHandler(Thread):
         Thread.__init__(self)
         self.socket_to_client = socket_to_client
         threads: list[Thread] = threading.enumerate()
+        self.io_stream_client = self.socket_to_client.makefile(mode='rw')
 
         self.server_thread = None
         for thread in threads:
@@ -59,98 +59,123 @@ class ClientHandler(Thread):
                 self.server_thread = thread
                 break
 
+    # response can be str, data, ...
+    def send_response(self, response_data):
+        '''
+        Response data should be something that is serializable to JSON.
+        This includes dict, list, str, int, float, bool, and None.
+        '''
+        response: str = json.dumps({"response": response_data})
+        logging.info(f"CLH \t- sent response: {response}")
+        self.io_stream_client.write(f"{response}\n")
+        self.io_stream_client.flush()
+
+    def wait_for_message(self):
+        try:
+            msg = ""
+            while msg == "":
+                msg = self.io_stream_client.readline().rstrip('\n')
+            
+            print(msg)
+            msg: dict = json.loads(msg)
+            commando = msg["commando"]
+            data = msg["data"]
+                
+            return commando, data
+        except Exception as e:
+            logging.error(f"CLH \t- error in wait_for_message: {e}")
+            return "", {}
+
     def run(self):
         try:
-            io_stream_client = self.socket_to_client.makefile(mode='rw')
             logging.info("CLH \t- started & waiting...")
-            # waiting for first commando, but if empty, continue waiting
-            msg: str = io_stream_client.readline().rstrip('\n')
-            if msg == "":
-                pass
-            else:
-                msg: dict = json.loads(msg)
-                commando = msg["commando"]
+            commando, data = self.wait_for_message()
 
-            while commando != "CLOSE":
-                if commando == "Overstimulated by age":
-                    logging.debug(f"CLH  \tSEARCH: count overstimulated people of certain age.")
-                    # get message/parameter from client
-                    Age = msg["Age"]
-                    logging.debug(f"CLH  \t\tchosen age: {Age}")
+            while commando != "close":
+                if commando == "overstimulated by age":
+                    # Step 1: parameters from client
+                    age = data["age"]
 
-                    total, overstimulated, data = search.overstimulated_by_age(self.server_thread.data, Age)
-                    logging.debug(f"CLH  \t\t{overstimulated} of {total} people are overstimulated at the age of {Age}.")
+                    # Step 2: execute search query
+                    total, overstimulated, df = search.overstimulated_by_age(age)
                     
-                    res: dict = {"total": total, "overstimulated": overstimulated, "data": data}
-                    res: str = json.dumps(res)
-                    io_stream_client.write(f"{res}\n")
-                    io_stream_client.flush()
-                elif commando == "Stress by sleep and overstimulated":
-                    logging.debug(f"CLH  \tSEARCH: average stress level of people with certain sleep hours and overstimulated.")
-                    # get message/parameter from client
-                    sleep_hours = msg["Sleep hours"]
-                    overstimulated = msg["Overstimulated"]
-                    logging.debug(f"CLH  \t\tchosen sleep hours: {sleep_hours}, overstimulated: {overstimulated}")
+                    # Step 3: convert to serializable format
+                    res: dict = {"total": total, "overstimulated": overstimulated, "dataframe": df.to_dict(orient="records")}
 
-                    data = search.stress_by_sleep_and_overstimulated(self.server_thread.data, sleep_hours, overstimulated)
+                    # Step 4: send response to client
+                    self.send_response(res)
 
-                    res: dict = {"data": data}
-                    res: str = json.dumps(res)
-                    io_stream_client.write(f"{res}\n")
-                    io_stream_client.flush()
-                elif commando == "Depression by social interactions and screen time":
-                    logging.debug(f"CLH  \tSEARCH: depression score of people with certain social interactions and screen time.")
-                    # get message/parameter from client
-                    social_interaction = msg["social_interaction"]
-                    screen_time = msg["screen_time"]
-                    logging.debug(f"CLH  \t\tsocial interactions: {social_interaction}, screen time: {screen_time}")
+                elif commando == "stress by sleep and overstimulated":
+                    # Step 1: parameters from client
+                    sleep_hours = data["sleep_hours"]
+                    overstimulated = data["overstimulated"]
 
-                    data = search.depression_by_social_interactions_and_screen_time(self.server_thread.data, social_interaction, screen_time)
-                    res: dict = {"data": data}
-                    res: str = json.dumps(res)
-                    io_stream_client.write(f"{res}\n")
-                    io_stream_client.flush()
-                elif commando == "Headache by exercise hours and overthinking":
-                    logging.debug(f"CLH  \tSEARCH: headache score of people with certain exercise hours and overthinking.")
-                    # get message/parameter from client
-                    exercise_hours = msg["exercise_hours"]
-                    overthinking_score = msg["overthinking_score"]
-                    logging.debug(f"CLH  \t\texercise hours: {exercise_hours}, overthinking score: {overthinking_score}")
+                    # Step 2: execute search query
+                    mode_values, df = search.stress_by_sleep_and_overstimulated(sleep_hours, overstimulated)
 
-                    data = search.headache_by_exercise_hours_and_overthinking(self.server_thread.data, exercise_hours, overthinking_score)
-                    res: dict = {"data": data}
-                    res: str = json.dumps(res)
-                    io_stream_client.write(f"{res}\n")
-                    io_stream_client.flush()
-                    ...
-                elif commando == "Login":
-                    name = msg["name"]
-                    password = msg["password"]
-                    logging.debug(f"CLH  \tLogin: {name}")
+                    # Step 3: convert to serializable format
+                    res: dict = {"mode_values": mode_values, "dataframe": df.to_dict(orient="records")}
 
-                    with open("./server/allowed_users.json", "r", encoding="utf-8") as f:
-                        allowed_users = json.load(f)
+                    # Step 4: send response to client
+                    self.send_response(res)
 
-                    for user in allowed_users["users"]:
+                elif commando == "depression by social interactions and screen time":
+                    # Step 1: parameters from client
+                    social_interaction = data["social_interaction"]
+                    screen_time = data["screen_time"]
+
+                    # Step 2: execute search query
+                    mode_values, df = search.depression_by_social_interactions_and_screen_time(social_interaction, screen_time)
+
+                    # Step 3: convert to serializable format
+                    res: dict = {"mode_values": mode_values, "dataframe": df.to_dict(orient="records")}
+
+                    # Step 4: send response to client
+                    self.send_response(res)
+                    
+                elif commando == "headache by exercise hours and overthinking":
+                    # Step 1: parameters from client
+                    exercise_hours = data["exercise_hours"]
+                    overthinking_score = data["overthinking_score"]
+
+                    # Step 2: execute search query
+                    mode_values, df = search.headache_by_exercise_hours_and_overthinking(exercise_hours, overthinking_score)
+                    
+                    # Step 3: convert to serializable format
+                    res: dict = {"mode_values": mode_values, "dataframe": df.to_dict(orient="records")}
+
+                    # Step 4: send response to client
+                    self.send_response(res)
+                
+                elif commando == "login":
+                    # Step 1: parameters from client
+                    # prevents error if no name or password is given
+                    password = data.get("password")
+                    name = data.get("name")
+
+                    with open("./server/users.json", "r", encoding="utf-8") as f:
+                        users: list[dict] = json.load(f)
+
+                    # Step 2: check if name and password are in users.json
+                    found = False
+                    for user in users:
                         if user["name"] == name and user["password"] == password:
-                            logging.debug(f"CLH  \t\tLogin successful for {name}")
-                            io_stream_client.write(f"Success\n")
-                            io_stream_client.flush()
+                            found = True
                             break
-                        else:
-                            logging.debug(f"CLH  \t\tLogin failed for {name}")
-                            io_stream_client.write(f"Failed\n")
-                            io_stream_client.flush()
-                # waiting for new commando
-                msg: str = io_stream_client.readline().rstrip('\n')
-                msg: dict = json.loads(msg)
-                commando = msg["commando"]
+
+                    # Step 3: send response to client
+                    self.send_response("Success" if found else "Failed")
+                
+                elif commando == "ping":
+                    self.send_response("pong")
+                
+                commando, data = self.wait_for_message()
             
             # close the connection
-            logging.info(f"CLH \t- closing connection with {self.socket_to_client.getpeername()}")
             self.server_thread.list_clients.remove(self)
         except Exception as e:
             logging.error(f"CLH \t- error in clienthandler thread: {e}")
+            raise e
 
 
 server = Server()
