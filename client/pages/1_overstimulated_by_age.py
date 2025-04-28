@@ -43,7 +43,7 @@ else:
         if st.button("Confirm", key="confirm"):
             # send message to server with age as parameter
             commando: str = "overstimulated by age"
-            : dict = {"age": age}
+            data: dict = {"age": age}
             send_message(commando, data)
             response = get_response()
 
@@ -57,10 +57,9 @@ else:
 
         st.write("##### Result:")
         if st.session_state.confirm and not df.empty:
-            with st.container(border=True, height=100):
-                st.write(f"**:primary-background[{overstimulated}]** out of **:primary-background[{total}]** people are overstimulated at age **:primary-background[{age}]**.")
+            st.metric(label="Overstimulated", value=overstimulated, border=True)
         else:
-            st.container(border=True, height=100)
+            st.container(border=True, height=105)
 
     with col2:
         # vertical line to separate the columns

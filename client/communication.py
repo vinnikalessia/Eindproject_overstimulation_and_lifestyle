@@ -37,7 +37,7 @@ def check_server_connection():
         response = get_response()
 
         if response == "pong":
-            st.toast("Connected to the server.", icon="✅")
+            pass
         else:
             st.toast("Connection error. Please check your connection and try again.", icon="❗")
     else:

@@ -15,10 +15,10 @@ class Search():
         """
         df = self.dataset.copy()
         
-        rows_by_age = df.loc[df["Age"] == age]
-        total_by_age = int(rows_by_age["Age"].count())
-        overstimulated = rows_by_age.loc[rows_by_age["Overstimulated"] == 1]
-        total_overstimulated = int(overstimulated["Age"].count())
+        df = df[df["Age"] == age]
+        total_by_age = len(df)
+        df_overstimulated = df[df["Overstimulated"] == 1]
+        total_overstimulated = len(df_overstimulated)
 
         df["Overstimulated"] = df["Overstimulated"].replace({0: "No", 1: "Yes"})
 

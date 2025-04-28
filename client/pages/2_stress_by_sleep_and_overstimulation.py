@@ -59,8 +59,7 @@ else:
 
         st.write("##### Result:")
         if st.session_state.confirm and not df.empty:
-            with st.container(border=True, height=100):
-                st.markdown(f"Common stress level: **:primary-background[{mode_values}]**")
+            st.metric(label="Average stress level", value=mode_values, border=True)    
         else:
             st.container(border=True, height=100)
 
