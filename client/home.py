@@ -1,16 +1,8 @@
 # Imports                             |
 # ────────────────────────────────────
 from communication import get_connection, send_message, send_close_message, check_server_connection, get_response
-from streamlit_cookies_controller import CookieController
-from connection.connection import ClientServerConnection
-import matplotlib.pyplot as plt
-from dotenv import load_dotenv
 import streamlit as st
-import pandas as pd
-import socket
 import time
-import json
-import os
 
 # Setup & init                        |
 # ────────────────────────────────────
@@ -49,7 +41,6 @@ def connect_button():
                     st.session_state.state_message = None
                     st.session_state.connected = False
                     st.session_state.user = None
-                    st.cache_resource.clear()
                     st.rerun()
         else:
             if st.button(":green[:material/wifi:] Connect to server"):
@@ -61,10 +52,8 @@ def connect_button():
         if st.session_state.state_message is not None:
             if "error" in st.session_state.state_message:
                 st.error(st.session_state.state_message, icon="❗")
-                st.cache_resource.clear()
             elif "Enjoy" in st.session_state.state_message:
                 st.success(st.session_state.state_message, icon="✅")
-                st.cache_resource.clear()
 
 connect_button()
 

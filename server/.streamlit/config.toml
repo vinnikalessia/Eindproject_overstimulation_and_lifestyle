@@ -1,0 +1,11 @@
+[client]
+# toolbarMode = "viewer"
+
+[server]
+headless = true
+
+[theme]
+primaryColor = "#114255"
+backgroundColor = "#E7EFEF"
+secondaryBackgroundColor = "#C8DBDA"
+textColor = "#01161E"

@@ -1,6 +1,4 @@
-from streamlit_cookies_controller import CookieController
 from connection.connection import ClientServerConnection
-import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 import streamlit as st
 import pandas as pd

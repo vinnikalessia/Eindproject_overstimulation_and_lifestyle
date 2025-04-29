@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 from threading import Thread
 from search import Search
-import pandas as pd
 import threading
 import logging
 import socket
@@ -17,7 +16,8 @@ class Server(Thread):
     def __init__(self):
         # initialize the thread, list of clients and read data
         Thread.__init__(self)
-        self.list_clients = []
+        self.clienthandlers: list[ClientHandler] = [] # all clienthandler threads also the ones streamlit creates
+        self.clients: list = []
         
         # creating socket
         self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,26 +37,30 @@ class Server(Thread):
                 # establish a connection
                 socket_to_client, addr = self.serversocket.accept()
                 logging.info(f"Server - got a connection from {addr})")
-                clh = ClientHandler(socket_to_client)
-                self.list_clients.append(clh)
+                clh = ClientHandler(socket_to_client, addr)
+                self.clienthandlers.append(clh)
                 clh.start()
                 logging.info(f"Server - ok, clienthandler started. Current Thread count: {threading.active_count()}.")
-                logging.info(f"Server - counts clienthandlers: {len(self.list_clients)}")
+                logging.info(f"Server - counts clienthandlers: {len(self.clienthandlers)}")
             except Exception as e:
                 logging.error(f"Server - error in server thread: {e}")
                 break
 
+    def get_clients(self):
+        return self.clients
+
 class ClientHandler(Thread):
-    def __init__(self, socket_to_client):
+    def __init__(self, socket_to_client, addr):
         Thread.__init__(self)
         self.socket_to_client = socket_to_client
         threads: list[Thread] = threading.enumerate()
         self.io_stream_client = self.socket_to_client.makefile(mode='rw')
+        self.addr = addr
 
         self.server_thread = None
         for thread in threads:
             if isinstance(thread, Server):
-                self.server_thread = thread
+                self.server_thread: Server = thread
                 break
 
     # response can be str, data, ...
@@ -153,7 +157,7 @@ class ClientHandler(Thread):
                     password = data.get("password")
                     name = data.get("name")
 
-                    with open("./server/users.json", "r", encoding="utf-8") as f:
+                    with open("../server/users.json", "r", encoding="utf-8") as f:
                         users: list[dict] = json.load(f)
 
                     # Step 2: check if name and password are in users.json
@@ -161,6 +165,10 @@ class ClientHandler(Thread):
                     for user in users:
                         if user["name"] == name and user["password"] == password:
                             found = True
+                            # add user to clients
+                            # self.server_thread.clients.append(name)
+                            # add clh to clients
+                            self.server_thread.clients.append(self)
                             break
 
                     # Step 3: send response to client
@@ -170,13 +178,36 @@ class ClientHandler(Thread):
                     self.send_response("pong")
                 
                 commando, data = self.wait_for_message()
-            
+
+            # Remove logged-in user when disconnecting
+            logging.info(f"CLH \t- client: clienthandlers before{self.server_thread.clienthandlers}")
+            logging.info(f"CLH \t- client: clients before {self.server_thread.clients}")
+
             # close the connection
-            self.server_thread.list_clients.remove(self)
+            self.server_thread.clienthandlers.remove(self)
+            if self in self.server_thread.clients:
+                # remove the client from the clients list
+                self.server_thread.clients.remove(self)
+            # and remove all clients that aren't in the clients list
+            for thread in self.server_thread.clienthandlers:
+                if thread not in self.server_thread.clients:
+                    self.server_thread.clienthandlers.remove(thread)
+            self.socket_to_client.close()
+
+            # current thread is:
+            logging.info(f"CLH \t- client: current thread: {threading.current_thread()}")
+
+            logging.info(f"CLH \t- client: clienthandlers after{self.server_thread.clienthandlers}")
+            logging.info(f"CLH \t- client: clients after{self.server_thread.clients}")
         except Exception as e:
             logging.error(f"CLH \t- error in clienthandler thread: {e}")
             raise e
 
+    def __repr__(self):
+        return f"ClientHandler({self.addr})"
 
-server = Server()
-server.start()
+# is going to run only when you run server.py directly
+# not when you import it in another file
+# if __name__ == "__main__":
+#     server = Server()
+#     server.start()

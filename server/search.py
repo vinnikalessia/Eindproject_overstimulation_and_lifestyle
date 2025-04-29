@@ -6,7 +6,7 @@ class Search():
         """
         Initialize the Search class.
         """
-        self.dataset = pd.read_csv("./dataset/dataset.csv")
+        self.dataset = pd.read_csv("../dataset/dataset.csv")
 
     # Zoekopdracht 1: How many people are overstimulated with the chosen age?
     def overstimulated_by_age(self, age: int) -> tuple[int, int, pd.DataFrame]:
