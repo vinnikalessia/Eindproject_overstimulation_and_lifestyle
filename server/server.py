@@ -165,9 +165,7 @@ class ClientHandler(Thread):
                     for user in users:
                         if user["name"] == name and user["password"] == password:
                             found = True
-                            # add user to clients
-                            # self.server_thread.clients.append(name)
-                            # add clh to clients
+                            # add clienthandler to clients
                             self.server_thread.clients.append(self)
                             break
 
@@ -192,6 +190,8 @@ class ClientHandler(Thread):
             for thread in self.server_thread.clienthandlers:
                 if thread not in self.server_thread.clients:
                     self.server_thread.clienthandlers.remove(thread)
+
+            # close connection with server
             self.socket_to_client.close()
 
             # current thread is:

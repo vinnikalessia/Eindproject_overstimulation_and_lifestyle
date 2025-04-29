@@ -16,7 +16,7 @@ def get_connection():
         socket_connection = ClientServerConnection(host, port)
         socket_connection.connect()
         st.session_state.connected = True
-        st.session_state.state_message = "You are now connected to the server. Enjoy the app!"
+        st.session_state.state_message = "You are succesfully connected!"
         return socket_connection
     except socket.error as e:
         st.session_state.state_message = f"Connection error: {e}. Please check your connection and try again."

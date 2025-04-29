@@ -20,6 +20,9 @@ if "state_message" not in st.session_state:
 if "error_message" not in st.session_state:
     st.session_state.error_message = None
 
+if "clear_cache" not in st.session_state:
+    st.session_state.clear_cache = False
+
 check_server_connection()
 
 # Authentication & app                |
@@ -31,7 +34,7 @@ else:
     st.title(f"Welcome back! {st.session_state.user} 👋")
 
 def connect_button():
-    col1, col2 = st.columns([1, 2])
+    col1, col2 = st.columns([3, 4])
     with col1:
         if st.session_state.connected == True:
             if st.button(":red[:material/wifi_off:] Disconnect from server"):
@@ -42,8 +45,10 @@ def connect_button():
                     st.session_state.connected = False
                     st.session_state.user = None
                     st.rerun()
+
         else:
             if st.button(":green[:material/wifi:] Connect to server"):
+                st.cache_resource.clear()
                 with st.spinner("Connecting..."):
                     time.sleep(1)
                     get_connection()
@@ -52,11 +57,11 @@ def connect_button():
         if st.session_state.state_message is not None:
             if "error" in st.session_state.state_message:
                 st.error(st.session_state.state_message, icon="❗")
-            elif "Enjoy" in st.session_state.state_message:
+            elif "succesfully" in st.session_state.state_message:
                 st.success(st.session_state.state_message, icon="✅")
 
 connect_button()
-
+    
 if not st.session_state.user:
     # input fields for login
     name = st.text_input(":material/person: Enter your name", key="name", disabled=not st.session_state.connected)
