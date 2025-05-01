@@ -1,7 +1,7 @@
 # Imports                             |
 # ────────────────────────────────────
 from communication import send_message, check_server_connection, get_response
-from connection.connection import ClientServerConnection
+from connection.connection import ServerHandler
 from dotenv import load_dotenv
 import streamlit as st
 import pandas as pd
@@ -45,7 +45,7 @@ else:
             commando: str = "overstimulated by age"
             data: dict = {"age": age}
             send_message(commando, data)
-            response = get_response()
+            response = get_response(commando)
 
             total = response["total"]
             overstimulated = response["overstimulated"]

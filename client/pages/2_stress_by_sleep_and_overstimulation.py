@@ -1,7 +1,7 @@
 # Imports                             |
 # ────────────────────────────────────
 from communication import send_message, check_server_connection, get_response
-from connection.connection import ClientServerConnection
+from connection.connection import ServerHandler
 from dotenv import load_dotenv
 import streamlit as st
 import pandas as pd
@@ -46,10 +46,10 @@ else:
 
         if st.button("Confirm", key="confirm"):
             # send message to server with sleep hours and overstimulated as parameters
-            commando: str = "Stress by sleep and overstimulated"
+            commando: str = "stress by sleep and overstimulated"
             data: dict = {"sleep_hours": sleep_hours, "overstimulated": overstimulated}
             send_message(commando, data)
-            response = get_response()
+            response = get_response(commando)
 
             df = pd.DataFrame(response["dataframe"])
             mode_values = response["mode_values"]

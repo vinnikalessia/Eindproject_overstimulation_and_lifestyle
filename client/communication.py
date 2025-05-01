@@ -1,23 +1,22 @@
-from connection.connection import ClientServerConnection
+from connection.connection import ServerHandler
 from dotenv import load_dotenv
 import streamlit as st
-import pandas as pd
 import socket
 import time
-import json
 import os
 
 @st.cache_resource(show_spinner=False)
-def get_connection():
+def get_server_handler():
     try:
         load_dotenv()
         host = os.getenv("HOST")
         port = int(os.getenv("PORT"))
-        socket_connection = ClientServerConnection(host, port)
-        socket_connection.connect()
+        server_handler = ServerHandler(host, port)
+        # will execute the run function
+        server_handler.start()
         st.session_state.connected = True
         st.session_state.state_message = "You are succesfully connected!"
-        return socket_connection
+        return server_handler
     except socket.error as e:
         st.session_state.state_message = f"Connection error: {e}. Please check your connection and try again."
         time.sleep(3)
@@ -31,32 +30,29 @@ def get_connection():
 @st.fragment(run_every=3)
 def check_server_connection():
     if st.session_state.connected:
-        send_message("ping", {})
-        response = get_response()
+        server_handler = get_server_handler()
+        
+        # check connection with server
+        try:
+            server_handler.send_message("ping", {})
+        except Exception as e:
+            st.session_state.connected = False
+            server_handler.io_stream.close()
+            server_handler.socket_to_server.close()
+            st.toast(f"Connection error: {e}. Please check your connection and try again.", icon="❗")
+            time.sleep(1)
+            st.rerun(scope="app")
+            return
 
-        if response == "pong":
-            pass
-        else:
-            st.toast("Connection error. Please check your connection and try again.", icon="❗")
+        message_from_server = None
+        if server_handler.received_messages:
+            for msg in server_handler.received_messages:
+                if msg["commando"] == "message":
+                    server_handler.received_messages.remove(msg)
+                    message_from_server = msg["data"]
+                    break
+        if message_from_server:
+            st.toast(f"Server message: {message_from_server}", icon="📬")
+            time.sleep(3)
     else:
         print("Not connected to the server.")
-
-# returns deserialized content of the response
-def get_response():
-    socket_connection = get_connection()
-    response: str = socket_connection.io_stream_client.readline().rstrip('\n')
-    response: dict = json.loads(response)
-    response_data = response["response"]
-    return response_data
-
-def send_message(commando: str, data: dict) -> dict:
-    socket_connection = get_connection()
-    msg = json.dumps({"commando": commando.lower(), "data": data})
-    socket_connection.io_stream_client.write(f"{msg}\n")
-    socket_connection.io_stream_client.flush()
-    print(f"Client - sent message: {msg}")
-    
-def send_close_message():
-    send_message("close", {})
-    socket_connection = get_connection()
-    socket_connection.close()

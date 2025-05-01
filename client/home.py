@@ -1,6 +1,6 @@
 # Imports                             |
 # ────────────────────────────────────
-from communication import get_connection, send_message, send_close_message, check_server_connection, get_response
+from communication import get_server_handler, check_server_connection
 import streamlit as st
 import time
 
@@ -20,18 +20,7 @@ if "state_message" not in st.session_state:
 if "error_message" not in st.session_state:
     st.session_state.error_message = None
 
-if "clear_cache" not in st.session_state:
-    st.session_state.clear_cache = False
-
 check_server_connection()
-
-# Authentication & app                |
-# ────────────────────────────────────
-if not st.session_state.connected or not st.session_state.user:
-    st.title("Welcome guest! 👋")
-    st.markdown("#### To use this app, please connect to the server first and login.")
-else:
-    st.title(f"Welcome back! {st.session_state.user} 👋")
 
 def connect_button():
     col1, col2 = st.columns([3, 4])
@@ -40,7 +29,8 @@ def connect_button():
             if st.button(":red[:material/wifi_off:] Disconnect from server"):
                 with st.spinner("Disconnecting..."):
                     time.sleep(1)
-                    send_close_message()
+                    server_handler = get_server_handler()
+                    server_handler.close()
                     st.session_state.state_message = None
                     st.session_state.connected = False
                     st.session_state.user = None
@@ -51,7 +41,7 @@ def connect_button():
                 st.cache_resource.clear()
                 with st.spinner("Connecting..."):
                     time.sleep(1)
-                    get_connection()
+                    get_server_handler()
                     st.rerun()
     with col2:
         if st.session_state.state_message is not None:
@@ -60,8 +50,16 @@ def connect_button():
             elif "succesfully" in st.session_state.state_message:
                 st.success(st.session_state.state_message, icon="✅")
 
+# Authentication & app                |
+# ────────────────────────────────────
+if not st.session_state.connected or not st.session_state.user:
+    st.title("Welcome guest! 👋")
+    st.markdown("#### To use this app, please connect to the server first and login.")
+else:
+    st.title(f"Welcome back! {st.session_state.user} 👋")
+
 connect_button()
-    
+
 if not st.session_state.user:
     # input fields for login
     name = st.text_input(":material/person: Enter your name", key="name", disabled=not st.session_state.connected)
@@ -78,8 +76,9 @@ if not st.session_state.user:
                 time.sleep(1)
                 commando = "login"
                 data = {"name": name, "password": password}
-                send_message(commando, data)
-                response = get_response()
+                server_handler = get_server_handler()
+                server_handler.send_message(commando, data)
+                response = server_handler.get_response(commando)
                 st.write(f"Server response: {response}")
 
             if response == "Success":
@@ -92,4 +91,3 @@ if not st.session_state.user:
             st.warning("Please enter both name and password.")
 else:
     st.write("You are logged in.")
-    

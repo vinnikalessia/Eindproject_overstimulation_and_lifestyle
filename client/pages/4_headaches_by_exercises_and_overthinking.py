@@ -1,7 +1,7 @@
 # Imports                             |
 # ────────────────────────────────────
-from communication import get_connection, send_message, send_close_message, check_server_connection, get_response
-from connection.connection import ClientServerConnection
+from communication import get_server_handler, send_message, send_close_message, check_server_connection, get_response
+from connection.connection import ServerHandler
 from datetime import time as dt
 from dotenv import load_dotenv
 import streamlit as st
@@ -64,7 +64,7 @@ else:
             commando: str = "Headache by exercise hours and overthinking"
             data: dict = {"exercise_hours": exercise_hours, "overthinking_score": overthinking_score}
             send_message(commando, data)
-            response = get_response()
+            response = get_response(commando)
 
             df = pd.DataFrame(response["dataframe"])
             mode_values = response["mode_values"]

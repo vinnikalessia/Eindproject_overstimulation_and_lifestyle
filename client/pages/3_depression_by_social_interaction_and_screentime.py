@@ -1,7 +1,7 @@
 # Imports                             |
 # ────────────────────────────────────
 from communication import send_message, check_server_connection, get_response
-from connection.connection import ClientServerConnection
+from connection.connection import ServerHandler
 from dotenv import load_dotenv
 import streamlit as st
 import pandas as pd
@@ -46,10 +46,10 @@ else:
         
         if st.button("Confirm", key="confirm"):
             # send message to server with social interactions and screen time as parameters
-            commando: str = "Depression by social interactions and screen time"
+            commando: str = "depression by social interactions and screen time"
             data: dict = {"social_interaction": social_interaction, "screen_time": screen_time}
             send_message(commando, data)
-            response = get_response()
+            response = get_response(commando)
 
             df = pd.DataFrame(response["dataframe"])
             mode_values = response["mode_values"]
