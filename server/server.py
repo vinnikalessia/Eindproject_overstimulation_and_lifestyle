@@ -57,9 +57,6 @@ class Server(Thread):
         logging.warning(f"Server - Client {client_name} not found")
         return False
 
-    def get_clients(self):
-        return self.clienthandlers
-
 class ClientHandler(Thread):
     def __init__(self, socket_to_client: socket.socket, addr):
         Thread.__init__(self)
@@ -67,7 +64,7 @@ class ClientHandler(Thread):
         threads: list[Thread] = threading.enumerate()
         self.io_stream = self.socket_to_client.makefile(mode='rw')
         self.addr = addr
-        self.name = None
+        self.name = ""
         self.connected = True
 
         self.server_thread = None

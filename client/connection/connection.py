@@ -14,16 +14,19 @@ class ServerHandler(Thread):
         self.client_cookie_guid = str(uuid.uuid4())
         self.received_messages = []
         self.connected = False
+        self.terminated = False
 
     def run(self):
         # init
         self.__connect()
+        logging.info(self.connected)
         while True:
             commando, data = self.wait_for_message()
             if commando == "close":
                 break
             msg = {"commando": commando, "data": data}
             self.received_messages.append(msg)
+        
         
         if self.connected is False:
             # client initiated the closing, this is the server's response
@@ -33,6 +36,7 @@ class ServerHandler(Thread):
         else:
             # server initiated the closing, I am responding
             self.connected = False
+            self.terminated = True
             self.send_message("close", {})
             time.sleep(1)
             self.io_stream.close()
@@ -52,6 +56,7 @@ class ServerHandler(Thread):
         try:
             logging.info("Closing connection with server...")
             self.connected = False
+            self.terminated = True
             self.send_message("close", {})
         except Exception as e:
             logging.error(f"Error closing connection: {e}")

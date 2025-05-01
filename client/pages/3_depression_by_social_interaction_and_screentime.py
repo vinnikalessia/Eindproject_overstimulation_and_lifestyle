@@ -1,6 +1,6 @@
 # Imports                             |
 # ────────────────────────────────────
-from communication import send_message, check_server_connection, get_response
+from communication import check_server_connection, get_server_handler
 from connection.connection import ServerHandler
 from dotenv import load_dotenv
 import streamlit as st
@@ -13,18 +13,16 @@ import os
 # ────────────────────────────────────
 st.set_page_config(page_title="Average depression score based on social interaction and screen time", page_icon="😟", layout="wide")
 
-if "connected" not in st.session_state:
-    st.session_state.connected = False
-
 if "user" not in st.session_state:
     st.session_state.user = None
 
 check_server_connection()
+server_handler = get_server_handler()
 
 # Authentication & app                |
 # ────────────────────────────────────
 # What could be my depression score if I have x social interactions and y screen time?
-if not st.session_state.connected or not st.session_state.user:
+if not server_handler.connected or not st.session_state.user:
     st.title("Welcome guest! 👋")
     st.error("Sorry, you can't use the app unless you are connected and logged in.", icon="❗")
     time.sleep(3)
@@ -48,8 +46,8 @@ else:
             # send message to server with social interactions and screen time as parameters
             commando: str = "depression by social interactions and screen time"
             data: dict = {"social_interaction": social_interaction, "screen_time": screen_time}
-            send_message(commando, data)
-            response = get_response(commando)
+            server_handler.send_message(commando, data)
+            response = server_handler.get_response(commando)
 
             df = pd.DataFrame(response["dataframe"])
             mode_values = response["mode_values"]

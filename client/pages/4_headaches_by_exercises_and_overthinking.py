@@ -1,6 +1,6 @@
 # Imports                             |
 # ────────────────────────────────────
-from communication import get_server_handler, send_message, send_close_message, check_server_connection, get_response
+from communication import get_server_handler, check_server_connection
 from connection.connection import ServerHandler
 from datetime import time as dt
 from dotenv import load_dotenv
@@ -14,13 +14,11 @@ import os
 # ────────────────────────────────────
 st.set_page_config(page_title="Average occurences of headache in a week based on exercise hours and overthinking", page_icon="🤕", layout="wide")
 
-if "connected" not in st.session_state:
-    st.session_state.connected = False
-
 if "user" not in st.session_state:
     st.session_state.user = None
 
 check_server_connection()
+server_handler = get_server_handler()
 
 # list options exercise time
 time_options = ["0:00", "0:15", "0:30", "0:45", "1:00", "1:15", "1:30", "1:45", "2:00", "2:15", "2:30", "2:45", "3:00"]
@@ -38,7 +36,7 @@ def convert_time_to_float(time_str: str) -> float:
 # Authentication & app                |
 # ────────────────────────────────────
 # How many times could I get a headache in a week if I have x exercise hours and y overthinking?
-if not st.session_state.connected or not st.session_state.user:
+if not server_handler.connected or not st.session_state.user:
     st.title("Welcome guest! 👋")
     st.error("Sorry, you can't use the app unless you are connected and logged in.", icon="❗")
     time.sleep(3)
@@ -63,8 +61,8 @@ else:
             # send message to server with exercise hours and overthinking score as parameters
             commando: str = "Headache by exercise hours and overthinking"
             data: dict = {"exercise_hours": exercise_hours, "overthinking_score": overthinking_score}
-            send_message(commando, data)
-            response = get_response(commando)
+            server_handler.send_message(commando, data)
+            response = server_handler.get_response(commando)
 
             df = pd.DataFrame(response["dataframe"])
             mode_values = response["mode_values"]
