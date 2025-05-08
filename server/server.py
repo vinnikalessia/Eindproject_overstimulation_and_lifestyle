@@ -11,7 +11,7 @@ import os
 load_dotenv()
 search = Search()
 
-logging.basicConfig(level=logging.DEBUG, filename="./logging/server.log", format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.DEBUG, filename="./logging/server.log", format="%(asctime)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M")
 # write all logging messages to the file server.log
 
 class Server(Thread):
@@ -19,7 +19,6 @@ class Server(Thread):
         # initialize the thread, list of clients and read data
         Thread.__init__(self)
         self.clienthandlers: list[ClientHandler] = [] # all clienthandler threads also the ones streamlit creates
-        # self.clients: list = [] # wordt niet gebruikt?
         
         # creating socket
         self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
