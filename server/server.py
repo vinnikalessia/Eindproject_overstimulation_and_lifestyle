@@ -18,7 +18,7 @@ class Server(Thread):
         # initialize the thread, list of clients and read data
         Thread.__init__(self)
         self.clienthandlers: list[ClientHandler] = [] # all clienthandler threads also the ones streamlit creates
-        self.clients: list = []
+        # self.clients: list = [] # wordt niet gebruikt?
         
         # creating socket
         self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

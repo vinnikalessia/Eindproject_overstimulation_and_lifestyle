@@ -3,7 +3,6 @@ import logging
 import socket
 import json
 import time
-import uuid
 
 class ServerHandler(Thread):
     def __init__(self, host, port):
@@ -11,7 +10,6 @@ class ServerHandler(Thread):
         logging.info("Initializing connection")
         self.host = host
         self.port = port
-        self.client_cookie_guid = str(uuid.uuid4())
         self.received_messages = []
         self.connected = False
         self.terminated = False

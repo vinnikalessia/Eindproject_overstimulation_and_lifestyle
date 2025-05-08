@@ -4,7 +4,11 @@
     "password": "123"
     },
     {
-    "name": "Test",
-    "password": "test"
+    "name": "Stijn",
+    "password": "geheimwachtwoord"
+    },
+    {
+    "name": "Marie",
+    "password": "is_top"
     }
 ]

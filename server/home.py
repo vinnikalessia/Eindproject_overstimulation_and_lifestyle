@@ -7,7 +7,7 @@ import time
 
 # Setup & init                        |
 # ────────────────────────────────────
-st.set_page_config(page_title="Homepage", page_icon="🏠")
+st.set_page_config(page_title="Server", page_icon="🗄️")
 
 def show_avatar(image_url, name, caption):
     html_content = f"""
@@ -65,5 +65,6 @@ def run_server():
 server = run_server()
 
 st.title(f"Welcome to the :primary-background[server]! 👋")
+st.markdown("#### This is the server side of the application. You can manage connected clients here.")
 
 rerunner()
