@@ -31,7 +31,7 @@ def rerunner():
         col1, col2, col3 = st.columns(3, vertical_alignment="center")
         with col1:
             show_avatar(
-                "https://media.discordapp.net/attachments/1175112305067962388/1367170502941999164/image.png?ex=68144500&is=6812f380&hm=91173afd7800fa376a6bbfee85c11b9e8d3fb8a33899d598d325290f8f9e28d0&format=webp&quality=lossless&width=283&height=259&",
+                "https://github.com/vinnikalessia/Eindproject_overstimulation_and_lifestyle/blob/main/img/Dataset_columns.png",
                 name,
                 f"{client_handler.addr[0]}:{client_handler.addr[1]}",
             )
