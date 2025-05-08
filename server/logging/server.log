@@ -1,0 +1,16 @@
+2025-05-08 15:25:57,035 - INFO - Server - got a connection from ('127.0.0.1', 55666))
+2025-05-08 15:25:57,035 - INFO - CLH 	- started & waiting...
+2025-05-08 15:25:57,035 - INFO - Server - ok, clienthandler started. Current Thread count: 6.
+2025-05-08 15:25:57,036 - INFO - Server - counts clienthandlers: 1
+2025-05-08 15:25:57,036 - INFO - Server - waiting for a client...
+2025-05-08 15:26:03,192 - INFO - CLH 	- sent response: {"commando": "message", "data": "Hello !"}
+2025-05-08 15:26:03,192 - INFO - Server - Sent message to 
+2025-05-08 15:26:06,333 - INFO - CLH 	- sent response: {"commando": "message", "data": "Hello !"}
+2025-05-08 15:26:06,333 - INFO - Server - Sent message to 
+2025-05-08 15:28:27,229 - INFO - CLH 	- sent response: {"commando": "message", "data": "Hello !"}
+2025-05-08 15:28:27,229 - INFO - Server - Sent message to 
+2025-05-08 15:29:31,134 - INFO - CLH 	- sent response: {"commando": "login", "data": "Success"}
+2025-05-08 15:36:04,244 - INFO - CLH 	- sent response: {"commando": "message", "data": "Hello Al\u00e9ssia!"}
+2025-05-08 15:36:04,244 - INFO - Server - Sent message to Al�ssia
+2025-05-08 15:38:00,000 - WARNING - Server - This is an extra message
+2025-05-08 15:40:00,000 - ERROR - Server - This is an extra message

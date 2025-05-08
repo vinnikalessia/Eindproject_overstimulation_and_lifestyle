@@ -11,7 +11,8 @@ import os
 load_dotenv()
 search = Search()
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG, filename="./logging/server.log", format="%(asctime)s - %(levelname)s - %(message)s")
+# write all logging messages to the file server.log
 
 class Server(Thread):
     def __init__(self):
@@ -83,7 +84,7 @@ class ClientHandler(Thread):
         This includes dict, list, str, int, float, bool, and None.
         '''
         response = json.dumps({"commando": commando.lower(), "data": data})
-        logging.info(f"CLH \t- sent response: {response}")
+        logging.info(f"CLH \t- sent response: {response}") if commando != "ping" else None
         self.io_stream.write(f"{response}\n")
         self.io_stream.flush()
 
