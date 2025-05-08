@@ -12,7 +12,6 @@ load_dotenv()
 search = Search()
 
 logging.basicConfig(level=logging.DEBUG, filename="./logging/server.log", format="%(asctime)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M")
-# write all logging messages to the file server.log
 
 class Server(Thread):
     def __init__(self):
@@ -23,7 +22,6 @@ class Server(Thread):
         # creating socket
         self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # host = socket.gethostname()
-        # port = int(os.getenv("PORT"))
         host = "127.0.0.1"
         port = int(os.getenv("PORT"))
 
@@ -224,9 +222,3 @@ class ClientHandler(Thread):
 
     def __repr__(self):
         return f"ClientHandler({self.addr})"
-
-# is going to run only when you run server.py directly
-# not when you import it in another file
-# if __name__ == "__main__":
-#     server = Server()
-#     server.start()

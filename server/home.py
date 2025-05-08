@@ -83,6 +83,9 @@ def run_server():
     server.start()
     return server
 
+
+# App                                 |
+# ────────────────────────────────────
 server = run_server()
 
 colt1, colt2, colt3 = st.columns([2, 2.8, 2])

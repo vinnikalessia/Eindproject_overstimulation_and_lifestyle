@@ -8,7 +8,7 @@ class Search():
         """
         self.dataset = pd.read_csv("../dataset/dataset.csv")
 
-    # Zoekopdracht 1: How many people are overstimulated with the chosen age?
+    # Search 1: How many people are overstimulated with the chosen age?
     def overstimulated_by_age(self, age: int) -> tuple[int, int, pd.DataFrame]:
         """
         Returns the sum of people overstimulated by given age.
@@ -28,7 +28,7 @@ class Search():
 
         return total_by_age, total_overstimulated, df
     
-    # Zoekopdracht 2: What is the average stress level of people with the chosen sleep hours and overstimulated?
+    # Search 2: What is the average stress level of people with the chosen sleep hours and overstimulated?
     def stress_by_sleep_and_overstimulated(self, sleep_hours: int, overstimulated: str) -> tuple[str, pd.DataFrame]:
         """
         Returns the average stress level of people with the given sleep hours and overstimulated.
@@ -59,7 +59,7 @@ class Search():
 
         return mode_values, df_counts
 
-    # Zoekopdracht 3: What could be my depression score if I have x social interactions and y screen time?
+    # Search 3: What could be my depression score if I have x social interactions and y screen time?
     def depression_by_social_interactions_and_screen_time(self, social_interaction: int, screen_time: int) -> pd.DataFrame:
         """
         Returns the average depression score of people with the given social interactions and screen time.
@@ -86,7 +86,7 @@ class Search():
 
         return mode_values, df_counts
 
-    # Zoekopdracht 4: How many times could I get a headache in a week if I have x exercise hours and y overthinking?
+    # Search 4: How many times could I get a headache in a week if I have x exercise hours and y overthinking?
     def headache_by_exercise_hours_and_overthinking(self, exercise_hours: str, overthinking_score: int) -> pd.DataFrame:
         """
         Returns the average headache score of people with the given exercise time and overthinking score.
