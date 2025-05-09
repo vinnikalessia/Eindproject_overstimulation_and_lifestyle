@@ -2,7 +2,9 @@
 # ────────────────────────────────────
 from server import Server
 import streamlit as st
+import logging
 import time
+import os
 
 # Setup & init                        |
 # ────────────────────────────────────
@@ -31,7 +33,7 @@ def rerunner():
         col1, col2, col3 = st.columns(3, vertical_alignment="center")
         with col1:
             show_avatar(
-                "https://github.com/vinnikalessia/Eindproject_overstimulation_and_lifestyle/blob/main/img/Dataset_columns.png",
+                "https://github.com/vinnikalessia/Eindproject_overstimulation_and_lifestyle/blob/main/img/Profile_picture_cat.jpg?raw=true",
                 name,
                 f"{client_handler.addr[0]}:{client_handler.addr[1]}",
             )
@@ -83,14 +85,25 @@ def run_server():
     server.start()
     return server
 
-
 # App                                 |
 # ────────────────────────────────────
 server = run_server()
 
-colt1, colt2, colt3 = st.columns([2, 2.8, 2])
+colt1, colt2, colt3 = st.columns([1, 3, 1])
 with colt2:
     st.title("Welcome to the :primary-background[server]! 👋")
+with colt3:
+    st.container(border=False, height=12)
+    if st.button("Close server", type="primary"):
+        with st.spinner("Closing server..."):
+            state = server.close()
+            st.cache_resource.clear()
+        if state:
+            st.success("Server closed successfully! You can now close the tab", icon="✅")
+            time.sleep(1)
+            logging.info("Server - server closed")
+            os._exit(0)
+        
 
 st.container(border=False, height=16)
 

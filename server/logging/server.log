@@ -1,8 +1,131 @@
-2025-05-08 21:00 - INFO - Server - waiting for a client...
-2025-05-08 21:00 - INFO - Server - got a connection from ('127.0.0.1', 49308))
-2025-05-08 21:00 - INFO - CLH 	- started & waiting...
-2025-05-08 21:00 - INFO - Server - ok, clienthandler started. Current Thread count: 6.
-2025-05-08 21:00 - INFO - Server - counts clienthandlers: 1
-2025-05-08 21:00 - INFO - Server - waiting for a client...
-2025-05-08 21:04 - INFO - CLH 	- sent response: {"commando": "message", "data": "Hello !"}
-2025-05-08 21:04 - INFO - Server - Sent message to 
+2025-05-08 21:31 - INFO - Server - waiting for a client...
+2025-05-08 21:32 - INFO - Server - got a connection from ('127.0.0.1', 54292))
+2025-05-08 21:32 - INFO - CLH 	- started & waiting...
+2025-05-08 21:32 - INFO - Server - ok, clienthandler started. Current Thread count: 6.
+2025-05-08 21:32 - INFO - Server - counts clienthandlers: 1
+2025-05-08 21:32 - INFO - Server - waiting for a client...
+2025-05-08 21:32 - INFO - CLH 	- sent response: {"commando": "login", "data": "Success"}
+2025-05-08 21:32 - INFO - CLH 	- sent response: {"commando": "overstimulated by age", "data": {"total": 37, "overstimulated": 27, "dataframe": [{"Overstimulated": "Yes", "Count": 27}, {"Overstimulated": "No", "Count": 10}]}}
+2025-05-08 21:32 - INFO - CLH 	- sent response: {"commando": "stress by sleep and overstimulated", "data": {"mode_values": "1", "dataframe": [{"Stress_Level": 1, "Count": 31}, {"Stress_Level": 6, "Count": 27}, {"Stress_Level": 2, "Count": 27}, {"Stress_Level": 5, "Count": 26}, {"Stress_Level": 4, "Count": 19}, {"Stress_Level": 3, "Count": 18}, {"Stress_Level": 7, "Count": 16}]}}
+2025-05-08 21:33 - INFO - CLH 	- sent response: {"commando": "depression by social interactions and screen time", "data": {"mode_values": "", "dataframe": []}}
+2025-05-08 21:33 - INFO - CLH 	- sent response: {"commando": "depression by social interactions and screen time", "data": {"mode_values": "9", "dataframe": [{"Depression_Score": 9, "Count": 4}, {"Depression_Score": 8, "Count": 3}, {"Depression_Score": 6, "Count": 2}, {"Depression_Score": 4, "Count": 2}, {"Depression_Score": 2, "Count": 2}, {"Depression_Score": 3, "Count": 2}, {"Depression_Score": 7, "Count": 1}, {"Depression_Score": 5, "Count": 1}, {"Depression_Score": 1, "Count": 1}]}}
+2025-05-08 21:33 - INFO - CLH 	- sent response: {"commando": "headache by exercise hours and overthinking", "data": {"mode_values": "1 and 4", "dataframe": [{"Headache_Frequency": 4, "Count": 2}, {"Headache_Frequency": 1, "Count": 2}, {"Headache_Frequency": 5, "Count": 1}, {"Headache_Frequency": 2, "Count": 1}, {"Headache_Frequency": 6, "Count": 1}]}}
+2025-05-08 21:33 - INFO - CLH 	- sent response: {"commando": "message", "data": "Hello Al\u00e9ssia!"}
+2025-05-08 21:33 - INFO - Server - Sent message to Alï¿½ssia
+2025-05-08 21:33 - INFO - CLH 	- sent response: {"commando": "close", "data": {}}
+2025-05-08 21:33 - INFO - CLH 	- client: clienthandlers before[ClientHandler(('127.0.0.1', 54292))]
+2025-05-08 21:33 - INFO - CLH 	- client: clienthandlers after[]
+2025-05-08 21:33 - INFO - Server - got a connection from ('127.0.0.1', 54417))
+2025-05-08 21:33 - INFO - CLH 	- started & waiting...
+2025-05-08 21:33 - INFO - Server - ok, clienthandler started. Current Thread count: 6.
+2025-05-08 21:33 - INFO - Server - counts clienthandlers: 1
+2025-05-08 21:33 - INFO - Server - waiting for a client...
+2025-05-08 21:34 - INFO - CLH 	- sent response: {"commando": "login", "data": "Success"}
+2025-05-08 21:34 - INFO - CLH 	- client: clienthandlers before[ClientHandler(('127.0.0.1', 54417))]
+2025-05-08 21:34 - INFO - CLH 	- sent response: {"commando": "close", "data": {}}
+2025-05-08 21:34 - INFO - CLH 	- client: clienthandlers after[]
+2025-05-08 21:40 - INFO - Server - waiting for a client...
+2025-05-08 21:40 - INFO - Server - got a connection from ('127.0.0.1', 55308))
+2025-05-08 21:40 - INFO - CLH 	- started & waiting...
+2025-05-08 21:40 - INFO - Server - ok, clienthandler started. Current Thread count: 6.
+2025-05-08 21:40 - INFO - Server - counts clienthandlers: 1
+2025-05-08 21:40 - INFO - Server - waiting for a client...
+2025-05-08 21:43 - INFO - Server - waiting for a client...
+2025-05-08 21:43 - INFO - Server - got a connection from ('127.0.0.1', 55793))
+2025-05-08 21:43 - INFO - CLH 	- started & waiting...
+2025-05-08 21:43 - INFO - Server - ok, clienthandler started. Current Thread count: 6.
+2025-05-08 21:43 - INFO - Server - counts clienthandlers: 1
+2025-05-08 21:43 - INFO - Server - waiting for a client...
+2025-05-08 21:43 - INFO - CLH 	- sent response: {"commando": "login", "data": "Success"}
+2025-05-08 21:43 - INFO - Server - got a connection from ('127.0.0.1', 55829))
+2025-05-08 21:43 - INFO - CLH 	- started & waiting...
+2025-05-08 21:43 - INFO - Server - ok, clienthandler started. Current Thread count: 7.
+2025-05-08 21:43 - INFO - Server - counts clienthandlers: 2
+2025-05-08 21:43 - INFO - Server - waiting for a client...
+2025-05-08 21:44 - INFO - CLH 	- sent response: {"commando": "login", "data": "Success"}
+2025-05-08 21:44 - INFO - CLH 	- sent response: {"commando": "message", "data": "Hello Marie!"}
+2025-05-08 21:44 - INFO - Server - Sent message to Marie
+2025-05-08 21:44 - INFO - CLH 	- sent response: {"commando": "message", "data": "Hello Al\u00e9ssia!"}
+2025-05-08 21:44 - INFO - Server - Sent message to Alï¿½ssia
+2025-05-08 21:44 - INFO - CLH 	- sent response: {"commando": "overstimulated by age", "data": {"total": 49, "overstimulated": 34, "dataframe": [{"Overstimulated": "Yes", "Count": 34}, {"Overstimulated": "No", "Count": 15}]}}
+2025-05-08 21:44 - INFO - CLH 	- sent response: {"commando": "stress by sleep and overstimulated", "data": {"mode_values": "", "dataframe": []}}
+2025-05-08 21:44 - INFO - CLH 	- sent response: {"commando": "stress by sleep and overstimulated", "data": {"mode_values": "9", "dataframe": [{"Stress_Level": 9, "Count": 25}, {"Stress_Level": 6, "Count": 21}, {"Stress_Level": 3, "Count": 20}, {"Stress_Level": 2, "Count": 19}, {"Stress_Level": 4, "Count": 19}, {"Stress_Level": 7, "Count": 15}, {"Stress_Level": 5, "Count": 14}, {"Stress_Level": 8, "Count": 14}, {"Stress_Level": 1, "Count": 13}]}}
+2025-05-08 21:44 - INFO - CLH 	- sent response: {"commando": "depression by social interactions and screen time", "data": {"mode_values": "2 and 7", "dataframe": [{"Depression_Score": 2, "Count": 3}, {"Depression_Score": 7, "Count": 3}, {"Depression_Score": 4, "Count": 2}, {"Depression_Score": 5, "Count": 2}, {"Depression_Score": 3, "Count": 2}, {"Depression_Score": 8, "Count": 2}, {"Depression_Score": 9, "Count": 2}, {"Depression_Score": 1, "Count": 2}]}}
+2025-05-08 21:45 - INFO - CLH 	- sent response: {"commando": "headache by exercise hours and overthinking", "data": {"mode_values": "1 and 4", "dataframe": [{"Headache_Frequency": 4, "Count": 2}, {"Headache_Frequency": 1, "Count": 2}, {"Headache_Frequency": 5, "Count": 1}, {"Headache_Frequency": 2, "Count": 1}, {"Headache_Frequency": 6, "Count": 1}]}}
+2025-05-08 21:45 - INFO - CLH 	- client: clienthandlers before[ClientHandler(('127.0.0.1', 55793)), ClientHandler(('127.0.0.1', 55829))]
+2025-05-08 21:45 - INFO - CLH 	- sent response: {"commando": "close", "data": {}}
+2025-05-08 21:45 - INFO - CLH 	- client: clienthandlers after[ClientHandler(('127.0.0.1', 55793))]
+2025-05-08 21:45 - INFO - CLH 	- sent response: {"commando": "close", "data": {}}
+2025-05-08 21:45 - INFO - CLH 	- client: clienthandlers before[ClientHandler(('127.0.0.1', 55793))]
+2025-05-08 21:45 - INFO - CLH 	- client: clienthandlers after[]
+2025-05-09 11:48 - INFO - Server - waiting for a client...
+2025-05-09 11:50 - INFO - Server - waiting for a client...
+2025-05-09 11:51 - INFO - Server - closed all connections
+2025-05-09 11:51 - ERROR - Server - error in server thread: [WinError 10038] Er is geprobeerd een bewerking uit te voeren op iets anders dan een socket
+2025-05-09 11:51 - INFO - Server - waiting for a client...
+2025-05-09 11:55 - INFO - Server - waiting for a client...
+2025-05-09 11:56 - INFO - Server - closed all connections
+2025-05-09 11:56 - ERROR - Server - error in server thread: [WinError 10038] Er is geprobeerd een bewerking uit te voeren op iets anders dan een socket
+2025-05-09 11:56 - INFO - Server - server closed
+2025-05-09 11:59 - INFO - Server - waiting for a client...
+2025-05-09 11:59 - INFO - Server - closed all connections
+2025-05-09 11:59 - ERROR - Server - error in server thread: [WinError 10038] Er is geprobeerd een bewerking uit te voeren op iets anders dan een socket
+2025-05-09 11:59 - INFO - Server - server closed
+2025-05-09 12:00 - INFO - Server - waiting for a client...
+2025-05-09 12:01 - INFO - Server - closed all connections
+2025-05-09 12:01 - ERROR - Server - error in server thread: [WinError 10038] Er is geprobeerd een bewerking uit te voeren op iets anders dan een socket
+2025-05-09 12:01 - INFO - Server - server closed
+2025-05-09 12:56 - INFO - Server - waiting for a client...
+2025-05-09 13:02 - INFO - Server - waiting for a client...
+2025-05-09 13:17 - INFO - Server - got a connection from ('127.0.0.1', 61808))
+2025-05-09 13:17 - INFO - CLH 	- started & waiting...
+2025-05-09 13:17 - INFO - Server - ok, clienthandler started. Current Thread count: 7.
+2025-05-09 13:17 - INFO - Server - counts clienthandlers: 1
+2025-05-09 13:17 - INFO - Server - waiting for a client...
+2025-05-09 13:17 - INFO - CLH 	- sent response: {"commando": "login", "data": "Success"}
+2025-05-09 13:17 - INFO - CLH 	- sent response: {"commando": "overstimulated by age", "data": {"total": 49, "overstimulated": 34, "dataframe": [{"Overstimulated": "Yes", "Count": 34}, {"Overstimulated": "No", "Count": 15}]}}
+2025-05-09 13:18 - INFO - CLH 	- sent response: {"commando": "overstimulated by age", "data": {"total": 49, "overstimulated": 34, "dataframe": [{"Overstimulated": "Yes", "Count": 34}, {"Overstimulated": "No", "Count": 15}]}}
+2025-05-09 13:18 - INFO - CLH 	- sent response: {"commando": "close", "data": {}}
+2025-05-09 13:18 - INFO - Server - closed client Aléssia
+2025-05-09 13:18 - INFO - CLH 	- client: clienthandlers before[ClientHandler(('127.0.0.1', 61808))]
+2025-05-09 13:18 - INFO - CLH 	- client: clienthandlers after[]
+2025-05-09 13:18 - INFO - Server - closed all connections
+2025-05-09 13:18 - ERROR - Server - error in server thread: [WinError 10038] Er is geprobeerd een bewerking uit te voeren op iets anders dan een socket
+2025-05-09 13:18 - INFO - Server - server closed
+2025-05-09 13:19 - INFO - Server - waiting for a client...
+2025-05-09 13:19 - INFO - Server - got a connection from ('127.0.0.1', 61992))
+2025-05-09 13:19 - INFO - CLH 	- started & waiting...
+2025-05-09 13:19 - INFO - Server - ok, clienthandler started. Current Thread count: 7.
+2025-05-09 13:19 - INFO - Server - counts clienthandlers: 1
+2025-05-09 13:19 - INFO - Server - waiting for a client...
+2025-05-09 13:19 - INFO - CLH 	- sent response: {"commando": "login", "data": "Success"}
+2025-05-09 13:19 - INFO - CLH 	- sent response: {"commando": "overstimulated by age", "data": {"total": 49, "overstimulated": 34, "dataframe": [{"Overstimulated": "Yes", "Count": 34}, {"Overstimulated": "No", "Count": 15}]}}
+2025-05-09 13:19 - INFO - CLH 	- sent response: {"commando": "overstimulated by age", "data": {"total": 49, "overstimulated": 34, "dataframe": [{"Overstimulated": "Yes", "Count": 34}, {"Overstimulated": "No", "Count": 15}]}}
+2025-05-09 13:19 - INFO - CLH 	- sent response: {"commando": "stress by sleep and overstimulated", "data": {"mode_values": "9", "dataframe": [{"Stress_Level": 9, "Count": 25}, {"Stress_Level": 6, "Count": 21}, {"Stress_Level": 3, "Count": 20}, {"Stress_Level": 2, "Count": 19}, {"Stress_Level": 4, "Count": 19}, {"Stress_Level": 7, "Count": 15}, {"Stress_Level": 5, "Count": 14}, {"Stress_Level": 8, "Count": 14}, {"Stress_Level": 1, "Count": 13}]}}
+2025-05-09 13:30 - INFO - CLH 	- sent response: {"commando": "stress by sleep and overstimulated", "data": {"mode_values": "9", "dataframe": [{"Stress_Level": 9, "Count": 25}, {"Stress_Level": 6, "Count": 21}, {"Stress_Level": 3, "Count": 20}, {"Stress_Level": 2, "Count": 19}, {"Stress_Level": 4, "Count": 19}, {"Stress_Level": 7, "Count": 15}, {"Stress_Level": 5, "Count": 14}, {"Stress_Level": 8, "Count": 14}, {"Stress_Level": 1, "Count": 13}]}}
+2025-05-09 13:30 - INFO - CLH 	- sent response: {"commando": "stress by sleep and overstimulated", "data": {"mode_values": "9", "dataframe": [{"Stress_Level": 9, "Count": 25}, {"Stress_Level": 6, "Count": 21}, {"Stress_Level": 3, "Count": 20}, {"Stress_Level": 2, "Count": 19}, {"Stress_Level": 4, "Count": 19}, {"Stress_Level": 7, "Count": 15}, {"Stress_Level": 5, "Count": 14}, {"Stress_Level": 8, "Count": 14}, {"Stress_Level": 1, "Count": 13}]}}
+2025-05-09 13:30 - INFO - CLH 	- sent response: {"commando": "stress by sleep and overstimulated", "data": {"mode_values": "9", "dataframe": [{"Stress_Level": 9, "Count": 25}, {"Stress_Level": 6, "Count": 21}, {"Stress_Level": 3, "Count": 20}, {"Stress_Level": 2, "Count": 19}, {"Stress_Level": 4, "Count": 19}, {"Stress_Level": 7, "Count": 15}, {"Stress_Level": 5, "Count": 14}, {"Stress_Level": 8, "Count": 14}, {"Stress_Level": 1, "Count": 13}]}}
+2025-05-09 13:44 - INFO - CLH 	- sent response: {"commando": "close", "data": {}}
+2025-05-09 13:44 - INFO - Server - closed client Aléssia
+2025-05-09 13:44 - INFO - CLH 	- client: clienthandlers before[ClientHandler(('127.0.0.1', 61992))]
+2025-05-09 13:44 - INFO - CLH 	- client: clienthandlers after[]
+2025-05-09 13:44 - INFO - Server - closed all connections
+2025-05-09 13:44 - ERROR - Server - error in server thread: [WinError 10038] Er is geprobeerd een bewerking uit te voeren op iets anders dan een socket
+2025-05-09 13:44 - INFO - Server - server closed
+2025-05-09 13:45 - INFO - Server - waiting for a client...
+2025-05-09 13:45 - INFO - Server - got a connection from ('127.0.0.1', 64895))
+2025-05-09 13:45 - INFO - CLH 	- started & waiting...
+2025-05-09 13:45 - INFO - Server - ok, clienthandler started. Current Thread count: 7.
+2025-05-09 13:45 - INFO - Server - counts clienthandlers: 1
+2025-05-09 13:45 - INFO - Server - waiting for a client...
+2025-05-09 13:45 - INFO - CLH 	- sent response: {"commando": "login", "data": "Success"}
+2025-05-09 13:45 - INFO - CLH 	- sent response: {"commando": "close", "data": {}}
+2025-05-09 13:45 - INFO - CLH 	- client: clienthandlers before[ClientHandler(('127.0.0.1', 64895))]
+2025-05-09 13:45 - INFO - CLH 	- client: clienthandlers after[]
+2025-05-09 13:46 - INFO - Server - got a connection from ('127.0.0.1', 65008))
+2025-05-09 13:46 - INFO - CLH 	- started & waiting...
+2025-05-09 13:46 - INFO - Server - ok, clienthandler started. Current Thread count: 7.
+2025-05-09 13:46 - INFO - Server - counts clienthandlers: 1
+2025-05-09 13:46 - INFO - Server - waiting for a client...
+2025-05-09 13:46 - INFO - CLH 	- sent response: {"commando": "login", "data": "Success"}
+2025-05-09 13:46 - INFO - CLH 	- sent response: {"commando": "overstimulated by age", "data": {"total": 49, "overstimulated": 34, "dataframe": [{"Overstimulated": "Yes", "Count": 34}, {"Overstimulated": "No", "Count": 15}]}}

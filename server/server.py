@@ -55,6 +55,22 @@ class Server(Thread):
         logging.warning(f"Server - Client {client_name} not found")
         return False
 
+    def close(self) -> bool:
+        for client in self.clienthandlers:
+            try:
+                client.close()
+                logging.info(f"Server - closed client {client.name}")
+            except Exception as e:
+                logging.error(f"Server - error in closing client {client.name}: {e}")
+        time.sleep(2)
+        try:
+            self.serversocket.close()
+            logging.info("Server - closed all connections")
+            return True
+        except Exception as e:
+            logging.error(f"Server - error in closing socket: {e}")
+            return False
+
 class ClientHandler(Thread):
     def __init__(self, socket_to_client: socket.socket, addr):
         Thread.__init__(self)
@@ -101,6 +117,31 @@ class ClientHandler(Thread):
             logging.error(f"CLH \t- error in wait_for_message: {e}")
             return "", {}
 
+    def update_queries(self, commando: str):
+        """
+        Update the queries in the database.
+        """
+        # read queries.json and increment the count of the commando
+        with open("../server/queries.json", "r", encoding="utf-8") as f:
+            queries: dict = json.load(f)
+        if commando in queries:
+            queries[commando] += 1
+            # write the updated queries to the file
+            with open("../server/queries.json", "w", encoding="utf-8") as f:
+                json.dump(queries, f, indent=4)
+        
+        # and update the counter for commando in user.json
+        with open("../server/users.json", "r", encoding="utf-8") as f:
+            users: list[dict] = json.load(f)
+        for user in users:
+            if user["name"] == self.name:
+                if commando in user:
+                    user[commando] += 1
+                    # write the updated queries to the file
+                    with open("../server/users.json", "w", encoding="utf-8") as f:
+                        json.dump(users, f, indent=4)
+                break
+
     def run(self):
         try:
             logging.info("CLH \t- started & waiting...")
@@ -108,6 +149,9 @@ class ClientHandler(Thread):
 
             while commando != "close":
                 if commando == "overstimulated by age":
+                    # increment the query count
+                    self.update_queries(commando)
+
                     # Step 1: parameters from client
                     age = data["age"]
 
@@ -121,6 +165,9 @@ class ClientHandler(Thread):
                     self.send_response(commando, data)
 
                 elif commando == "stress by sleep and overstimulated":
+                    # increment the query count
+                    self.update_queries(commando)
+
                     # Step 1: parameters from client
                     sleep_hours = data["sleep_hours"]
                     overstimulated = data["overstimulated"]
@@ -135,6 +182,9 @@ class ClientHandler(Thread):
                     self.send_response(commando, data)
 
                 elif commando == "depression by social interactions and screen time":
+                    # increment the query count
+                    self.update_queries(commando)
+                    
                     # Step 1: parameters from client
                     social_interaction = data["social_interaction"]
                     screen_time = data["screen_time"]
@@ -149,6 +199,9 @@ class ClientHandler(Thread):
                     self.send_response(commando, data)
                     
                 elif commando == "headache by exercise hours and overthinking":
+                    # increment the query count
+                    self.update_queries(commando)
+                    
                     # Step 1: parameters from client
                     exercise_hours = data["exercise_hours"]
                     overthinking_score = data["overthinking_score"]
